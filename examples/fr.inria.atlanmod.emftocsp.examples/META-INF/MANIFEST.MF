@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: fr.inria.atlanmod.emftocsp.examples
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: %Bundle-Vendor
