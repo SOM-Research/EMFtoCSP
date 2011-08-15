@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: fr.inria.atlanmod.emftocsp.eclipsecs.libs
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.parctechnologies.eclipse;version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: %Bundle-Vendor

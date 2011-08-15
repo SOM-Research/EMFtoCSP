@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: fr.inria.atlanmod.emftocsp.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: fr.inria.atlanmod.emftocsp.ui.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.ui;bundle-version="3.6.0",
+ org.eclipse.jdt.ui;bundle-version="3.6.0",
+ org.eclipse.core.runtime;bundle-version="3.6.0",
+ org.eclipse.core.resources;bundle-version="3.6.0",
+ org.eclipse.uml2;bundle-version="3.0.0",
+ org.eclipse.uml2.uml,
+ org.eclipse.uml2.uml.resources;bundle-version="3.0.0",
+ org.eclipse.emf.ecore;bundle-version="2.6.0",
+ org.eclipse.emf.ecore.xmi;bundle-version="2.5.0",
+ org.eclipse.ocl.ecore;bundle-version="3.0.0",
+ fr.inria.atlanmod.emftocsp;bundle-version="1.0.0",
+ fr.inria.atlanmod.emftocsp.emf;bundle-version="1.0.0",
+ fr.inria.atlanmod.emftocsp.uml;bundle-version="1.0.0",
+ fr.inria.atlanmod.emftocsp.emftoecl;bundle-version="1.0.0",
+ fr.inria.atlanmod.emftocsp.umltoecl;bundle-version="1.0.0",
+ fr.inria.atlanmod.emftocsp.eclipsecs;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: %Bundle-Vendor
+

@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: fr.inria.atlanmod.emftocsp.umltoecl
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: fr.inria.atlanmod.emftocsp;bundle-version="1.0.0",
+ fr.inria.atlanmod.emftocsp.uml;bundle-version="1.0.0",
+ org.eclipse.uml2;bundle-version="3.0.0",
+ org.eclipse.emf.ecore;bundle-version="2.6.0",
+ org.eclipse.ocl;bundle-version="3.0.0",
+ org.eclipse.uml2.uml;bundle-version="3.0.0",
+ org.eclipse.core.resources;bundle-version="3.6.0",
+ org.eclipse.ocl.uml;bundle-version="3.0.0"
+Export-Package: fr.inria.atlanmod.emftocsp.umltoecl
+Bundle-Vendor: %Bundle-Vendor
