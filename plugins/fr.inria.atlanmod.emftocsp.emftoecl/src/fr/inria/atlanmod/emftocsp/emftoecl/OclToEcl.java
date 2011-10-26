@@ -11,6 +11,7 @@
 package fr.inria.atlanmod.emftocsp.emftoecl;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -27,12 +28,12 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.ocl.Environment;
 import org.eclipse.ocl.ecore.CallOperationAction;
-import org.eclipse.ocl.expressions.CollectionLiteralExp;
 import org.eclipse.ocl.ecore.Constraint;
 import org.eclipse.ocl.ecore.EcoreEnvironmentFactory;
 import org.eclipse.ocl.ecore.SendSignalAction;
 import org.eclipse.ocl.expressions.BooleanLiteralExp;
 import org.eclipse.ocl.expressions.CollectionItem;
+import org.eclipse.ocl.expressions.CollectionLiteralExp;
 import org.eclipse.ocl.expressions.IntegerLiteralExp;
 import org.eclipse.ocl.expressions.IteratorExp;
 import org.eclipse.ocl.expressions.OperationCallExp;
@@ -84,6 +85,9 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
   public String visitExpressionInOCL(ExpressionInOCL<EClassifier, EParameter> expression) {
     constraintName = ((Constraint)expression.eContainer()).getName();
     oclTranslation = new StringBuilder();
+    
+    oclTranslation.append("% OCL constraint " + expression.getBodyExpression().toString() + "\n" );
+    
     varStack = new Stack<String>();
     firstPredicate = "";
     counter = 0;
@@ -178,12 +182,16 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
   @Override
   public String visitVariableExp(VariableExp<EClassifier, EParameter> v) {
     ++counter;
+    oclTranslation.append("% Lookup for variable " + v.getName() + "\n");
     String predName = "nVariable" + counter + constraintName;
     oclTranslation.append(predName);
     oclTranslation.append("(_, Vars, Result):-");
     oclTranslation.append("\n\t");
     oclTranslation.append("ocl_variable(Vars,");
     int index = varStack.search(v.getName());
+    if (index < 0) {
+    	System.err.println("Internal error: Variable " + v.getName() + " not found");
+    }
     oclTranslation.append(index);
     oclTranslation.append(",Result).\n");
     return predName;
@@ -254,8 +262,8 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
 
   @Override
   public String visitIteratorExp(IteratorExp<EClassifier, EParameter> callExp) {
-    String sourceResult = safeVisit(callExp.getSource());
-
+    String res = null;
+	
     List<String> variableResults;
     EList<Variable<EClassifier, EParameter>> variables = callExp.getIterator();
 
@@ -264,19 +272,33 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     } 
     else {
       variableResults = new java.util.ArrayList<String>(variables.size());
-      for (Variable<EClassifier, EParameter> iterVar : variables) {
-        varStack.push(iterVar.getName());  
-        variableResults.add(safeVisit(iterVar));
-      }
     }
-    String bodyResult = safeVisit(callExp.getBody());
-    if (!variables.isEmpty())             
-      for (int i = 0; i < variables.size(); i++) 
-        varStack.pop();    
-    return handleIteratorExp(callExp, sourceResult, variableResults, bodyResult);
+    Iterator<Variable<EClassifier, EParameter>> it = variables.iterator();
+    return processIterators(callExp, it, variableResults);
+    
   }
    
-  @Override
+  private String processIterators(IteratorExp<EClassifier, EParameter> callExp, Iterator<Variable<EClassifier, EParameter>> it, List<String> variableResults) {
+
+	  Variable<EClassifier, EParameter> v = it.next();
+	  String sourceExpression = safeVisit(callExp.getSource());
+      varStack.push(v.getName());  
+      variableResults.add(safeVisit(v));
+      if (it.hasNext()) {
+    	  String body = processIterators(callExp, it, variableResults);
+    	  String res = handleIteratorExp(callExp, sourceExpression, variableResults, body);
+          varStack.pop();
+          return res;
+
+      } else {
+    	  String body = safeVisit(callExp.getBody()); 
+      	  String res = handleIteratorExp(callExp, sourceExpression, variableResults, body);
+          varStack.pop();
+          return res;
+      }
+    }
+    
+@Override
   protected String handleIteratorExp(IteratorExp<EClassifier, EParameter> callExp, String sourceResult, List<String> variableResults, String bodyResult) {    
     String itName = callExp.getName();
     String type = itName.equalsIgnoreCase("forAll") ? "Boolean" : getType(callExp);
@@ -349,7 +371,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
 
   private String getType(OperationCallExp<EClassifier, EOperation> exp) {
     EClassifier sourceType = exp.getSource().getType();
-    EClassifier resultType = null;
+    EClassifier resultType = exp.getType();
     if (sourceType instanceof PredefinedType) 
       resultType = TypeUtil.getResultType(exp, env, sourceType, exp.getReferredOperation(), exp.getArgument());
     return getName(resultType);
@@ -363,7 +385,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     return res; 
   }
   
-  private String getCSPOpName(String name, String type, int arguments) {
+  private String getCSPOpName(String name, String type, int arguments, OperationCallExp<EClassifier, EOperation> callExp) {
     if (name.equals("<"))
       name = "less_than";
     else if (name.equals(">"))
@@ -388,6 +410,15 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       name = "binary_minus";
     else if (name.equals("-") && arguments == 0)
       name = "unary_minus";
+    else if (name.equals("union")) {
+    	if (callExp.getArgument().get(0).getType().getName().startsWith("Bag")) { 
+    		name = "unionBag";
+    	} else {
+    		name = "unionSet";
+    	}
+    } else if (name.equals("=")) {
+    	return "equals";
+    }
     return name;
   }  
   
@@ -399,7 +430,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     if (opCSPName.equals("allInstances"))
       return transAllInstancesOp(callExp, sourceResult, argumentResults);
@@ -413,9 +444,15 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     if (opCSPName.equals("greater_than") || opCSPName.equals("less_than") || opCSPName.equals("greater_equal") || opCSPName.equals("less_equal"))
       return trans2ParamsArithRelOp(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("equals") || opCSPName.equals("not_equals")) {
-      if (opType.equals("Boolean") || opType.equals("Integer") || opType.equals("String") || opType.equals("Real") || opType.equals("Date"))
-        return trans2ParamsArithRelOp(callExp, sourceResult, argumentResults);
-      return trans2ParamsEqOverObjects(callExp, sourceResult, argumentResults);
+      //if (opType.equals("Boolean") || opType.equals("Integer") || opType.equals("String") || opType.equals("Real") || opType.equals("Date"))
+      String t = callExp.getSource().getType().getName();
+      if (t.equals("Boolean") || t.equals("Integer") || t.equals("String") || t.equals("Real") || t.equals("Date"))
+    	return trans2ParamsArithRelOp(callExp, sourceResult, argumentResults);
+      else if (t.startsWith("Bag") || t.startsWith("Set") || t.startsWith("Sequence")) {
+    	  return trans1ParamOverCollections(callExp, sourceResult, argumentResults);
+      } else {
+    	  return trans2ParamsEqOverObjects(callExp, sourceResult, argumentResults);
+      }
     }
     if (opCSPName.equals("and") || opCSPName.equals("or") || opCSPName.equals("xor") || opCSPName.equals("implies"))
       return trans2ParamsLogicOp(callExp, sourceResult, argumentResults);
@@ -428,7 +465,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     if (opCSPName.equals("excludes") || opCSPName.equals("includes") || opCSPName.equals("excludesAll") || opCSPName.equals("includesAll") ||
         opCSPName.equals("product") || opCSPName.equals("count") || opCSPName.equals("indexOf") || opCSPName.equals("append") ||
         opCSPName.equals("prepend") || opCSPName.equals("at") || opCSPName.equals("set_difference") || opCSPName.equals("symmetricDifference") ||
-        opCSPName.equals("union") || opCSPName.equals("intersection") || opCSPName.equals("including") || opCSPName.equals("excluding"))
+        opCSPName.equals("union") || opCSPName.equals("unionSet") || opCSPName.equals("unionBag") || opCSPName.equals("intersection") || opCSPName.equals("including") || opCSPName.equals("excluding"))
       return trans1ParamOverCollections(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("insertAt") || opCSPName.equals("subSequence") || opCSPName.equals("subOrderedSet"))
       return trans2ParamsOverCollections(callExp, sourceResult, argumentResults);
@@ -444,6 +481,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       return trans1ParamWithType(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("oclIsNew"))
       return transOclIsNew(callExp, sourceResult, argumentResults);
+    System.err.println("Unhandled opcall: " + callExp);
     return "";    
   }
 
@@ -498,7 +536,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -520,7 +558,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -533,12 +571,19 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     oclTranslation.append(argumentResults.get(0));
     oclTranslation.append("(Instances, Vars, Obj2),");
     oclTranslation.append("\n\t");
-    oclTranslation.append("ocl_");
+    oclTranslation.append("ocl_obj_");
     oclTranslation.append(opCSPName);
     oclTranslation.append("(Instances, Obj1, \"");
-    oclTranslation.append(argumentResults.get(1)); 
+    /* FIXME: The ocl_obj_equals operation requires a type, but this was not given here.
+              However, the general problem seems to regard the encoding. 
+              We cannot determine the runtime type here, as it would 
+              was: oclTranslation.append(argumentResults.get(1)); */
+    oclTranslation.append("VOID");
     oclTranslation.append("\", Obj2, \"");
-    oclTranslation.append(uml.getName(op.getEParameters().get(0).getEType()));
+    /* FIXME: ditto.
+              was: oclTranslation.append(uml.getName(op.getEParameters().get(0).getEType()));
+    */
+    oclTranslation.append("VOID");
     oclTranslation.append("\", Result).\n");
     return predName;
   }
@@ -550,7 +595,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -572,7 +617,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -596,7 +641,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -621,7 +666,8 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -649,7 +695,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -680,7 +726,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -705,7 +751,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -732,7 +778,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
     
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
@@ -756,7 +802,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     int params = 0;
     if (op.getEParameters() != null)
       params = op.getEParameters().size();
-    String opCSPName = getCSPOpName(opName, opType, params);
+    String opCSPName = getCSPOpName(opName, opType, params, callExp);
 
     ++counter;
     String predName = "n" + opCSPName + counter + constraintName;
