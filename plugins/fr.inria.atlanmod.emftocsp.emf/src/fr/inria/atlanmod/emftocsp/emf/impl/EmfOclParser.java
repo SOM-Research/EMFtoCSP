@@ -41,7 +41,7 @@ public class EmfOclParser implements IOclParser<Constraint, Resource> {
   public Constraint parseOclConstraint(Object context, String key, String constraint) {
     OCL ocl = org.eclipse.ocl.ecore.OCL.newInstance();
     OCLHelper<EClassifier, EOperation, EStructuralFeature, Constraint> helper = ocl.createOCLHelper();
-
+    
     if (context instanceof EClassifier)
       helper.setContext((EClassifier)context);
     else if (context instanceof EOperation) {
@@ -67,47 +67,77 @@ public class EmfOclParser implements IOclParser<Constraint, Resource> {
     }
     return null;
   }
-  
-  @Override
-  public List<Constraint> parseEmbeddedConstraints(Resource modelResource) {
-    List<Constraint> constraints = new ArrayList<Constraint>();
-    EmfModelReader modelReader = new EmfModelReader(modelResource);
-    
-    for (EClass c : modelReader.getClasses()) {
-      List<EAnnotation> annotationList = c.getEAnnotations();      
-      if (annotationList != null) 
-        for (EAnnotation ea : annotationList)
-          if (ea.getSource().endsWith("ocl") || ea.getSource().endsWith("OCL"))   //$NON-NLS-1$ //$NON-NLS-2$
-            for (String key : ea.getDetails().keySet()) {        
-              EObject context = ea.getEModelElement();
-              String val = ea.getDetails().get(key);              
-              if (!key.equalsIgnoreCase("invariant") && !key.equalsIgnoreCase("body") && !key.equalsIgnoreCase("derivation") && !key.equalsIgnoreCase("precondition") && !key.equalsIgnoreCase("postcondition") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-                  && !key.equalsIgnoreCase("inv") && !key.equalsIgnoreCase("pre") && !key.equalsIgnoreCase("post") && context instanceof EClassifier) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                Constraint ct = parseOclConstraint(ea.getEModelElement(), key, val);
-                ct.setName(key);
-                constraints.add(ct);
-              }
-            }            
-      List<EOperation> operationList = c.getEOperations();
-      if (operationList != null) 
-        for (EOperation op : operationList) {
-          annotationList = op.getEAnnotations();
-          if (annotationList != null)
-            for (EAnnotation ea : annotationList)
-              if (ea.getSource().endsWith("ocl") || ea.getSource().endsWith("OCL"))   //$NON-NLS-1$ //$NON-NLS-2$
-                for (String key : ea.getDetails().keySet()) {        
-                  EObject context = ea.getEModelElement();
-                  String val = ea.getDetails().get(key);              
-                  if (key.equalsIgnoreCase("precondition") || key.equalsIgnoreCase("pre") || key.equalsIgnoreCase("postcondition") || key.equalsIgnoreCase("post") && context instanceof EOperation) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-                    Constraint ct = parseOclConstraint(ea.getEModelElement(), key, val);
-                    ct.setName(op.getName() + "_" + key); //$NON-NLS-1$
-                    constraints.add(ct);
-                  }
-                }
-        }
-    }    
-    return constraints;
-  }
+
+	@Override
+	public List<Constraint> parseEmbeddedConstraints(Resource modelResource) {
+		List<Constraint> constraints = new ArrayList<Constraint>();
+		EmfModelReader modelReader = new EmfModelReader(modelResource);
+
+		for (EClass c : modelReader.getClasses()) {
+
+			// TODO: where are these constants defined?
+			// TODO: make code more robust and verbose
+			EAnnotation eaConstraints = c.getEAnnotation("http://www.eclipse.org/emf/2002/Ecore");
+			EAnnotation eaOCLPivot = c.getEAnnotation("http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot");
+			if (eaConstraints != null && eaOCLPivot != null) {
+				String constraintNames = eaConstraints.getDetails().get("constraints");
+				if (constraintNames != null) {
+					String[] constraintNamesArr = constraintNames.split(" ");
+					for (String constraintName : constraintNamesArr) {
+						String constraintBody = eaOCLPivot.getDetails().get(constraintName);
+						System.err.println("Processing constraint: " + constraintName);
+						System.err.println("Body: " + constraintBody);
+						Constraint ct = parseOclConstraint(c, constraintName, constraintBody);
+						if (ct != null) {
+							ct.setName(constraintName);
+							constraints.add(ct);
+						}
+					}
+				}
+			}
+
+			/*
+			 * FIXME: This way of getting the OCL constraints seems to be out of
+			 * date?
+			 */
+			List<EAnnotation> annotationList = c.getEAnnotations();
+			if (annotationList != null)
+				for (EAnnotation ea : annotationList) {
+
+					if (ea.getSource().endsWith("ocl") || ea.getSource().endsWith("OCL")) //$NON-NLS-1$ //$NON-NLS-2$
+						for (String key : ea.getDetails().keySet()) {
+							EObject context = ea.getEModelElement();
+							String val = ea.getDetails().get(key);
+							if (!key.equalsIgnoreCase("invariant") && !key.equalsIgnoreCase("body") && !key.equalsIgnoreCase("derivation") && !key.equalsIgnoreCase("precondition") && !key.equalsIgnoreCase("postcondition") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+									&& !key.equalsIgnoreCase("inv") && !key.equalsIgnoreCase("pre") && !key.equalsIgnoreCase("post") && context instanceof EClassifier) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								Constraint ct = parseOclConstraint(ea.getEModelElement(), key, val);
+								ct.setName(key);
+								constraints.add(ct);
+							}
+						}
+
+				}
+
+			List<EOperation> operationList = c.getEOperations();
+			if (operationList != null)
+				for (EOperation op : operationList) {
+					annotationList = op.getEAnnotations();
+					if (annotationList != null)
+						for (EAnnotation ea : annotationList)
+							if (ea.getSource().endsWith("ocl") || ea.getSource().endsWith("OCL")) //$NON-NLS-1$ //$NON-NLS-2$
+								for (String key : ea.getDetails().keySet()) {
+									EObject context = ea.getEModelElement();
+									String val = ea.getDetails().get(key);
+									if (key.equalsIgnoreCase("precondition") || key.equalsIgnoreCase("pre") || key.equalsIgnoreCase("postcondition") || key.equalsIgnoreCase("post") && context instanceof EOperation) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+										Constraint ct = parseOclConstraint(ea.getEModelElement(), key, val);
+										ct.setName(op.getName() + "_" + key); //$NON-NLS-1$
+										constraints.add(ct);
+									}
+								}
+				}
+		}
+		return constraints;
+	}
 
   @Override
   public List<Constraint> parseOclDocument(IFile oclDocument, Resource modelResource) throws Exception {
