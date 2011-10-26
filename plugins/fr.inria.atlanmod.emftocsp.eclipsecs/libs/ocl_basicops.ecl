@@ -513,6 +513,7 @@ aux_baseType(Type, BaseType) :-
 
 %ocl_obj_equals(Instances, Obj1, Type1, Obj2, Type2, Result) :-
 %   Result is true if Obj1 and Obj2 are equal
+delay ocl_obj_equals(_, Obj1, _ , Obj2, _, _ ) if (var(Obj1);var(Obj2)).
 ocl_obj_equals(_, Obj1, Type1, Obj2, Type2, Result):-
    Result::0..1,
    % Compute the base type of each object - the top of the class hierarchy
