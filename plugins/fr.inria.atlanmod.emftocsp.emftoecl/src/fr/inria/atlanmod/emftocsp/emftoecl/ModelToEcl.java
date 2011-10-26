@@ -11,6 +11,7 @@
 package fr.inria.atlanmod.emftocsp.emftoecl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
 
 import fr.inria.atlanmod.emftocsp.IModelProperty;
@@ -122,6 +124,38 @@ public class ModelToEcl {
   protected String genCardinalityConstraintsSection() {  
     StringBuilder s = new StringBuilder();
     s.append("\t%Cardinality constraints\n\t");
+    
+    s.append("% cardinality constraints derived from containment tree (compositions)\n");
+    for (EClass c : cList) {
+    	boolean complete = true;
+    	List<String> cardVars = new ArrayList<String>();
+		for (EReference ref : c.getEReferences()) {
+			if (ref.isContainer()) {
+				EAssociation assoc = getAssociation(ref);
+				cardVars.add("S" + assoc.getName().toLowerCase());
+				if(ref.getLowerBound() != 1) {
+					complete = false;
+				}
+			}
+		}
+		if (! cardVars.isEmpty() ) {
+			s.append("\tS" + c.getName());
+			if (complete) {
+				s.append(" #= ");
+			} else {
+				s.append(" #=< ");
+			}
+			for (Iterator<String> itCardVar = cardVars.iterator(); itCardVar.hasNext();) {
+				s.append(itCardVar.next());
+				if (itCardVar.hasNext()) {
+					s.append(" + ");
+				}
+				else {
+					s.append(",\n");
+				}
+			}
+		}
+	}
 
     for(IModelProperty prop : properties) {
       if (prop instanceof StrongSatisfiabilityModelProperty)
@@ -165,7 +199,24 @@ public class ModelToEcl {
     return s.toString();    
   }
   
-  protected String genCardinalityInstantiationSection() { 
+  /**
+   * Returns the association that includes this reference.
+   */
+  private EAssociation getAssociation(EReference ref) {
+	  for (EAssociation as : asList) {
+		  EReference asRef1 = as.getDestinationEnd();
+		  EReference asRef2 = as.getDestinationEnd().getEOpposite();
+		  if (ref.equals(asRef1)) {
+			  return as;
+		  }
+		  if (ref.equals(asRef2)) {
+			  return as;
+		  }
+	  }
+	  throw new RuntimeException("Internal error (this should never happen): Could not find association for " + ref);
+}
+
+protected String genCardinalityInstantiationSection() { 
     StringBuilder s = new StringBuilder();
     s.append("\t%Instantiation of cardinality variables\n\t");    
     s.append("labeling(CardVariables),\n\t");
