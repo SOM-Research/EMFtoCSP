@@ -17,10 +17,21 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EParameter;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.ocl.ParserException;
 import org.eclipse.ocl.ecore.Constraint;
+import org.eclipse.ocl.ecore.EcoreFactory;
+import org.eclipse.ocl.ecore.EcorePackage;
+import org.eclipse.ocl.ecore.OCL;
+import org.eclipse.ocl.expressions.IteratorExp;
+import org.eclipse.ocl.expressions.OCLExpression;
+import org.eclipse.ocl.expressions.Variable;
+import org.eclipse.ocl.helper.OCLHelper;
 import org.eclipse.ocl.utilities.ExpressionInOCL;
 
 import fr.inria.atlanmod.emftocsp.IModelProperty;
@@ -119,11 +130,18 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
     HashMap<String, String> ctfpMap = new HashMap<String, String>();
     
     try {
+    	  OCL ocl = org.eclipse.ocl.ecore.OCL.newInstance();
+          OCLHelper<EClassifier, EOperation, EStructuralFeature, Constraint> helper = ocl.createOCLHelper();
+        
       OclToEcl oclVisitor = OclToEcl.getInstance();                
       List<Constraint> cList = oclParser.parseModelConstraints(modelResource, oclDocument);
       for (Constraint c : cList) {
         if (!c.getStereotype().equalsIgnoreCase("precondition") && !c.getStereotype().equalsIgnoreCase("postcondition")) {
           ExpressionInOCL oclExpression = (ExpressionInOCL) c.getSpecification();
+          EClass contextCls = (EClass) c.getConstrainedElements().get(0);
+    	  
+          insertQuantificationForSelf(helper, contextCls, oclExpression);          
+
           s.append(oclExpression.accept(oclVisitor));
           ctfpMap.put(c.getName(), oclVisitor.getConstraintFirstPredicate());
           s.append("\n");                      
@@ -168,6 +186,46 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
     }
     return s.toString();
   }
+
+  /**
+   * Add quantification for self variable if required.
+   * @param helper 
+   * @param contextCls The context of this expression (i.e., the type of "self")
+   * @param oclExpression The OCL expression to be extended
+   * @throws ParserException
+   */
+  @SuppressWarnings("rawtypes")
+  private void insertQuantificationForSelf(OCLHelper<EClassifier, EOperation, EStructuralFeature, Constraint> helper,
+		EClass contextCls, ExpressionInOCL oclExpression) throws ParserException {
+	
+	  /* TODO: This method inserts the quantification for "self" only if this variable
+	   *       occurs. This is working and practical. 
+	   *       However, the precise semantics of OCL would require that self is always quantified.
+	   *       In the long term, a switch for EMFtoCSP should be added.
+	   */
+	  OCLExpression bodyExp = oclExpression.getBodyExpression();
+	  LookupSelfVariableVisitor lookupVisitor = new LookupSelfVariableVisitor();
+	  bodyExp.accept(lookupVisitor);
+	  Variable<EClassifier, EParameter> selfDecl = lookupVisitor.getResult();
+	  if (selfDecl != null) {
+		  System.err.println("Adding required self variable quantification");
+	      EcorePackage oclPackage =  (EcorePackage) oclExpression.eClass().getEPackage();
+	      EcoreFactory oclFactory = (EcoreFactory) oclPackage.getEFactoryInstance();
+	      IteratorExp forAllExp = oclFactory.createIteratorExp();
+	      forAllExp.setName("forAll");
+	      forAllExp.setType((EClassifier) bodyExp.getType());
+	      selfDecl.setName("self");
+	      selfDecl.setType(contextCls);
+	      forAllExp.getIterator().add(selfDecl);
+	      forAllExp.setBody(bodyExp);
+	      
+	      helper.setContext(contextCls);
+	      OCLExpression<EClassifier> allInstancesExp = helper.createQuery(contextCls.getName() + ".allInstances()");
+	      forAllExp.setSource(allInstancesExp);
+
+	      oclExpression.setBodyExpression(forAllExp);
+	  }
+}
     
   @Override
   public String getCspCodeFileExtension() {
