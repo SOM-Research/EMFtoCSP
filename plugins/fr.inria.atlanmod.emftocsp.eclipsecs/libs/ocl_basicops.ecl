@@ -617,6 +617,8 @@ findObjectByOid([H|T], Oid, Obj) :-
 %      only one object, instead of a list it become the first object of the set
 
 delay ocl_navigation(_,_,_,_,X,_) if var(X).
+ocl_navigation(_, _, _, _, ocl_undef, ocl_undef) :- !.
+ocl_navigation(_, _, _, _, [ocl_undef], [ocl_undef]) :- !.
 ocl_navigation(Instances, Association, SrcRole, DstRole, Objects, Result) :-
 
    % Get the list of oids of the source objects
