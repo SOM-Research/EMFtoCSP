@@ -434,6 +434,41 @@ ocl_real_less_equal(Instances, Vars, Pred1, Pred2, Result) :-
 
 %------------------------------------------------------------------------------
 %
+% String operations
+% 
+%------------------------------------------------------------------------------
+
+ocl_string_concat(Instances, Vars, Pred1, Pred2, Result) :-
+	apply(Pred1, [Instances, Vars, X]),
+	apply(Pred2, [Instances, Vars, Y]),
+	str_concat(X,Y,Result).
+
+ocl_string_size(Instances, Vars, Pred, Result) :-
+	apply(Pred, [Instances, Vars, X]),
+	str_len(X,Result).
+
+ocl_string_not_equals(Instances, Vars, Pred1, Pred2, Result) :-
+	Result :: 0..1,
+	Z :: 0..1,
+	apply(Pred1, [Instances, Vars, X]),
+	apply(Pred2, [Instances, Vars, Y]),
+	Result #= 1 - Z,
+	ocl_str_eq(X,Y,Z).
+
+ocl_string_equals(Instances, Vars, Pred1, Pred2, Result) :-
+	Result :: 0..1,
+	apply(Pred1, [Instances, Vars, X]),
+	apply(Pred2, [Instances, Vars, Y]),
+	ocl_str_eq(X,Y,Result).
+
+delay ocl_str_eq(S1,S2,1) if nonground(S1),nonground(S2).
+ocl_str_eq(S1,S2,0) :- str_neq(S1,S2).
+ocl_str_eq(S,S,1).
+
+
+
+%------------------------------------------------------------------------------
+%
 % Base OCL operators - allInstances, VariableExp, navigation...
 % 
 %------------------------------------------------------------------------------

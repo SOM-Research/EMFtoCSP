@@ -210,7 +210,7 @@ gviz_write_attributes(Stream, Object, TypeName) :-
       true;
       attIndex(TypeName, AttribName, Idx),
       % Write another attribute
-      printf(Stream, "- %s = %d\\l", [AttribName, AttribValue])
+      printf(Stream, "- %s = '%w'\\l", [AttribName, AttribValue])
      )
    ).
 

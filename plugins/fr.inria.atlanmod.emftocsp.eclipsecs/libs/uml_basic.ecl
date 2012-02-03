@@ -90,9 +90,12 @@ differentOids(Instances):-
 orderedInstances(Instances) :-
   getOidList(Instances, OidList),
   % Oids should fulfill the #< relation
-  orderedList(#<, OidList),
-  % Attributes should fulfill a less restrictive <= relation
-  orderedList(orderForAttributes, Instances).
+  orderedList(#<, OidList).
+
+% STRING: disabled
+%,
+%  % Attributes should fulfill a less restrictive <= relation
+%  orderedList(orderForAttributes, Instances).
 
 %orderForAttributes(ObjectA, ObjectB) :-
 %   Constrain ObjectA to be less or equal than ObjectB, according to some order.
@@ -171,12 +174,17 @@ constraintsBinAssocMultiplicities(Assoc, RoleA, RoleB, CardList) :-
   (MaxA  \= "*" -> SizeAssoc #=< MaxA * SizeB;  true),
   (MaxB  \= "*" -> SizeAssoc #=< MaxB * SizeA;  true).
 
+
 % constraintsBinAssocMultiplicities(Assoc, RoleA, RoleB, CardList)
 %    Define constraints on the participants cardinalities derived from
 %    the minimum and maximum  multiplicity of a given association
-
-delay linksConstraintMultiplicities(X,_,_,_) if nonground(X).
-linksConstraintMultiplicities(Instances, Assoc, RoleA, RoleB):-
+%
+% 03.02.2012 FB: removed suspension on ground(Instances), suspension is now
+%                on both link end lists, additionally, global constraints
+%                are applied on upper bounds and in the special case [N..N].   
+linksConstraintMultiplicities(Instances, Assoc, RoleA, RoleB) :-
+  index(Assoc, IndexAssoc),
+  nth1(IndexAssoc, Instances, LAssoc),
 
   % Get the minimum and maximum cardinalities for both ends
   % of the association
@@ -190,7 +198,6 @@ linksConstraintMultiplicities(Instances, Assoc, RoleA, RoleB):-
   roleIndex(Assoc, RoleB, RoleIndexB),
 
   % Get the indices for the associations and both classes
-  index(Assoc, IndexAssoc),
   roleType(Assoc, RoleA, ClassA),
   index(ClassA, ClassIndexA),
   roleType(Assoc, RoleB, ClassB),
@@ -199,9 +206,19 @@ linksConstraintMultiplicities(Instances, Assoc, RoleA, RoleB):-
   % Get the instances variables for the association and both classes
   nth1(ClassIndexA, Instances, OClassA),
   nth1(ClassIndexB, Instances, OClassB),
-  nth1(IndexAssoc, Instances, LAssoc),
   getPartList(LAssoc, RoleIndexA, LA),
   getPartList(LAssoc, RoleIndexB, LB),
+  linksConstraintMultiplicities1(OClassA,MinB,MaxB,LA),
+  linksConstraintMultiplicities1(OClassB,MinA,MaxA,LB),
+  linksConstraintMultiplicities2(MaxB,LA),
+  linksConstraintMultiplicities2(MaxA,LB),
+  linksConstraintMultiplicities3(OClassA,MinB,MaxB,LA),
+  linksConstraintMultiplicities3(OClassB,MinA,MaxA,LB).
+
+% helper for linksConstraintMultiplicities 
+% check multiplicities for ground link end list
+delay linksConstraintMultiplicities1(_,_,_,LA) if nonground(LA).
+linksConstraintMultiplicities1(OClassA,MinB,MaxB,LA) :-
   ( foreach(Obj, OClassA), 
     param(MinB, MaxB, LA) 
     do
@@ -209,15 +226,25 @@ linksConstraintMultiplicities(Instances, Assoc, RoleA, RoleB):-
       countOidInList(LA, Oid, Size),
       Size #>= MinB, 
       (MaxB  \= "*" -> Size #=< MaxB;  true)
-  ),
-  ( foreach(Obj2, OClassB), 
-    param(MinA, MaxA, LB) 
-    do
-      getOid(Obj2, Oid2),
-      countOidInList(LB, Oid2, Size2),
-      Size2 #>= MinA, 
-      (MaxA \= "*" -> Size2 #=< MaxA; true)
   ).
+
+% helper for linksConstraintMultiplicities 
+% pose global constraint on upper bound
+linksConstraintMultiplicities2("*",_) :- !.
+linksConstraintMultiplicities2(MaxB,LA) :-
+      ic_global:alldifferent(LA,MaxB).
+
+% helper for linksConstraintMultiplicities 
+% pose global constraint for the special case N..N 
+linksConstraintMultiplicities3(OClassA,N,N,LA) :-
+  !,
+  ( foreach(Obj, OClassA), 
+    param(LA) 
+    do
+      getOid(Obj, Oid),
+      ic_global:occurrences(Oid,LA,N)
+  ).
+linksConstraintMultiplicities3(_,_,_,_).
 
 % differentLinks(LinkList)
 %    All links in an association must have at least a different participant
