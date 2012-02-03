@@ -239,7 +239,7 @@ linksConstraintMultiplicities2(MaxB,LA) :-
 linksConstraintMultiplicities3(OClassA,N,N,LA) :-
   !,
   ( foreach(Obj, OClassA), 
-    param(LA) 
+    param(LA,N) 
     do
       getOid(Obj, Oid),
       ic_global:occurrences(Oid,LA,N)
