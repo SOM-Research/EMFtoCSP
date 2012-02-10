@@ -66,41 +66,21 @@
 
 %------------------------------------------------------------------------------
 
-
-
-% ocl_col_exists(Instances, Vars, Collection, Predicate, Result) :- 
-
 %    Test if Predicate holds in at least one element of Collection
-
-%    Exists is always false on the empty collection
-
-
-
+delay ocl_col_exists(_,_,Collection,_,_) if var(Collection).
 ocl_col_exists(Instances, Vars, Collection, Predicate, Result ) :-
-
-   Result::0..1,
-
-   property_sat_count(Instances, Vars, Collection, Predicate, N),
-
-   #>(N, 0, Result).
+	Result::0..1,
+	property_apply(Instances, Vars, Collection, Predicate, TruthValues),
+	( foreach(TV,TruthValues),fromto(0,In,Out,Result) do ic:or(In,TV,Out)).
 
 
-
-% ocl_col_forAll(Instances, Vars, Collection, Predicate, Result) :- 
 
 %    Test if Predicate holds in all elements of Collection
-
-
-
+delay ocl_col_forAll(_,_,Collection,_,_) if var(Collection).
 ocl_col_forAll(Instances, Vars, Collection, Predicate, Result ) :-
-
-   Result::0..1,
-
-   property_sat_count(Instances, Vars, Collection, Predicate, N),
-
-   ocl_col_size(Collection, S),
-
-   #=(N, S, Result).
+	Result::0..1,
+	property_apply(Instances, Vars, Collection, Predicate, TruthValues),
+	( foreach(TV,TruthValues),fromto(1,In,Out,Result) do ic:and(In,TV,Out)).
 
 
 
