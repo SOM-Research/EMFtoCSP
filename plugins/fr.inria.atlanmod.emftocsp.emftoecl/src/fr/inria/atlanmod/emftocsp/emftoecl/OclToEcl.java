@@ -243,6 +243,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       String dstRoleName = eRef.getName();
       String srcRoleName = eRef.getEOpposite() != null ? eRef.getEOpposite().getName() : "";
       String asName = srcRoleName.compareToIgnoreCase(dstRoleName) < 0 ? srcRoleName + "_" + dstRoleName : dstRoleName + "_" + srcRoleName; //$NON-NLS-1$ //$NON-NLS-2$
+      asName = asName.toLowerCase();
       oclTranslation.append("ocl_navigation(Instances,");
       oclTranslation.append('"');
       oclTranslation.append(asName);
@@ -313,7 +314,8 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     oclTranslation.append("\n\t");
     oclTranslation.append("ocl_");
     if (itName.equals("collect") || itName.equals("select") || itName.equals("reject") || itName.equals("collectNested") ||  itName.equals("sortedBy")) {  
-      oclTranslation.append(type); 
+    	//FIXME: this is a dirty bug fix
+    	oclTranslation.append("bag"); 
       oclTranslation.append("_"); 
     }
     else
@@ -410,6 +412,8 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       name = "binary_minus";
     else if (name.equals("-") && arguments == 0)
       name = "unary_minus";
+    else if (name.equals("concat"))
+        name = "concat";
     else if (name.equals("union")) {
     	if (callExp.getArgument().get(0).getType().getName().startsWith("Bag")) { 
     		name = "unionBag";
@@ -418,7 +422,8 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     	}
     } else if (name.equals("=")) {
     	return "equals";
-    }
+    } else if (name.equals("size") && callExp.getSource().getType().getName().contains("String")) 
+    	return "string_size";
     return name;
   }  
   
@@ -437,7 +442,8 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     if (opCSPName.equals("atPre"))
       return "ZERO_PARAMETERS_AT_PRE";
     if (opCSPName.equals("plus") || opCSPName.equals("times") || opCSPName.equals("division") || opCSPName.equals("div") ||
-        opCSPName.equals("mod") || opCSPName.equals("min") || opCSPName.equals("max") || opCSPName.equals("binary_minus"))
+        opCSPName.equals("mod") || opCSPName.equals("min") || opCSPName.equals("max") || opCSPName.equals("binary_minus") ||
+        opCSPName.equals("concat"))
       return trans2ParamsArithRelOp(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("abs") || opCSPName.equals("floor") || opCSPName.equals("round") || opCSPName.equals("unary_minus"))
       return trans1ParamArithOp(callExp, sourceResult, argumentResults);
@@ -458,6 +464,10 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       return trans2ParamsLogicOp(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("not"))
       return trans1ParamLogicOp(callExp, sourceResult, argumentResults);
+     
+    if (callExp.getSource().getType().getName().contains("String") && opCSPName.equals("string_size")) {
+        return trans1ParamArithOp(callExp, sourceResult, argumentResults);
+    }
     if (opCSPName.equals("size") || opCSPName.equals("isEmpty") || opCSPName.equals("notEmpty") || opCSPName.equals("sum") ||
         opCSPName.equals("flatten") || opCSPName.equals("asSet") || opCSPName.equals("asOrderedSet") || opCSPName.equals("asSequence") ||
         opCSPName.equals("asBag") || opCSPName.equals("first") || opCSPName.equals("last"))
@@ -547,7 +557,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     oclTranslation.append(opCSPName);
     oclTranslation.append("(Instances, Vars, ");
     oclTranslation.append(sourceResult);
-    oclTranslation.append("\", Result).\n");
+    oclTranslation.append(", Result).\n");
     return predName;
   }
   
@@ -652,7 +662,16 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     oclTranslation.append("(Instances, Vars, Value1),");
     oclTranslation.append("\n\t");
     oclTranslation.append("ocl_");
-    oclTranslation.append(opType.toLowerCase());
+    // TODO: this needs to be refactored and cleaned up!
+    if (callExp.getSource().getType().getName().startsWith("Bag")) {
+    	oclTranslation.append("bag");
+    } else if (callExp.getSource().getType().getName().startsWith("Set")) {
+    	oclTranslation.append("set");
+    } else if (callExp.getSource().getType().getName().startsWith("Sequence")) {
+    	oclTranslation.append("sequence");
+    } else {
+    	oclTranslation.append(opType.toLowerCase());
+    }
     oclTranslation.append("_");
     oclTranslation.append(opCSPName);
     oclTranslation.append("(Value1, Result).\n");

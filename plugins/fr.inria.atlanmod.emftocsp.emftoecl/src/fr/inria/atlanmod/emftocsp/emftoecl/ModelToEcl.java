@@ -59,7 +59,8 @@ public class ModelToEcl {
   }
 
   protected String genLibsSection() {
-    return ":-lib(ic).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).\n";   
+    return ":-lib(ic).\nlib(ic_global).\nlib(ic_global_gac).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).";
+    // TODO (next version): include CHR and String reasoning rules
   }
   
   protected String genStructSection() {
@@ -238,13 +239,14 @@ protected String genCardinalityInstantiationSection() {
       s.append(emfModelReader.getBaseClass(c).getName());
       s.append(", At");
       s.append(c.getName());
+      s.append(", Str");
+      s.append(c.getName());
       s.append("),\n\t");
     }
     s.append("\n\t");    
 
     for (String cName : cListNames) {
       s.append("\n\tdifferentOids");
-      s.append(cName);
       s.append("(O");
       s.append(cName);
       s.append("),");
@@ -253,7 +255,6 @@ protected String genCardinalityInstantiationSection() {
     
     for (String cName : cListNames) {
       s.append("\n\torderedInstances");
-      s.append(cName);
       s.append("(O");
       s.append(cName);
       s.append("),");
@@ -314,37 +315,42 @@ protected String genCardinalityInstantiationSection() {
     }    
     for (String asName : asListNames) {
       s.append("differentLinks");
-      s.append(asName.toLowerCase());
       s.append("(L");
       s.append(asName.toLowerCase());
       s.append("),\n\t");
     } 
     for (String asName : asListNames) {
       s.append("orderedLinks");
-      s.append(asName.toLowerCase());
-      s.append("(L");
-      s.append(asName.toLowerCase());
+      s.append("(Instances,\"" + asName.toLowerCase() + "\"");
       s.append("),\n\t");
     }     
     return s.toString(); 
   }
   
-  protected String genInstancesSection() {
+  protected String genInstancesSection1() {
+
+	  StringBuilder s = new StringBuilder();
+
+	  s.append("\tInstances = [");
+	  for (String cName : cListNames) {
+		  s.append("O");
+		  s.append(cName);
+		  s.append(", ");
+	  }    
+	  for (String asName : asListNames) {
+		  s.append("L");
+		  s.append(asName.toLowerCase());
+		  s.append(", ");
+	  } 
+	  s.deleteCharAt(s.length() - 2);
+	  s.append("],\n\t");
+	  return s.toString();
+  }
+  
+  protected String genInstancesSection2() {
     StringBuilder s = new StringBuilder();
 
-    s.append("\tInstances = [");
-    for (String cName : cListNames) {
-      s.append("O");
-      s.append(cName);
-      s.append(", ");
-    }    
-    for (String asName : asListNames) {
-      s.append("L");
-      s.append(asName.toLowerCase());
-      s.append(", ");
-    } 
-    s.deleteCharAt(s.length() - 2);
-    s.append("],\n\t");
+    s.append("\t");
     
     for(IModelProperty prop : properties) {
       if (prop instanceof LackOfConstraintsSubsumptionsModelProperty)
@@ -389,28 +395,45 @@ protected String genCardinalityInstantiationSection() {
     return s.toString();
   }
   
-  protected String genAllAttributesSection() {
-    StringBuilder s = new StringBuilder();
-    
-    s.append("\tAllAttributes = [");
-    for (String asName : asListNames) {
-      s.append("P");
-      s.append(asName.toLowerCase());
-      s.append(", ");
-    } 
-    for (String cName : cListNames) {
-      s.append("At");
-      s.append(cName);
-      s.append(", ");
-    }    
-    s.deleteCharAt(s.length() - 2);
-    s.append("],\n\t");
-    s.append("flatten(AllAttributes, Attributes),\n\t");
-    s.append("\n\t%Instantiation of attributes values\n\t");
-    s.append("labeling(Attributes).\n");
-    return s.toString();    
-  }
-  
+
+  protected String genAttributeLabelingSection() {
+	    StringBuilder s = new StringBuilder();
+	    s.append("\tAllAttributes = [");
+	    for (String asName : asListNames) {
+	        s.append("P");
+	        s.append(asName.toLowerCase());
+	        s.append(", ");
+	      } 
+	    for (String cName : cListNames) {
+	      s.append("At");
+	      s.append(cName);
+	      s.append(", ");
+	    }    
+	    s.deleteCharAt(s.length() - 2);
+	    s.append("],\n\t");
+	    s.append("flatten(AllAttributes, Attributes),\n\t");
+	    s.append("labeling(Attributes),\n");
+
+	    return s.toString();    
+	  }
+
+  protected String genStringLabelingSection() {
+	    StringBuilder s = new StringBuilder();
+	    s.append("\tAllCharacters = [");
+	    for (String cName : cListNames) {
+	      s.append("Str");
+	      s.append(cName);
+	      s.append(", ");
+	    }    
+	    s.deleteCharAt(s.length() - 2);
+	    s.append("],\n\t");
+	    s.append("flatten(AllCharacters, Characters),\n\t");
+	    s.append("labeling(Characters).\n");
+	    
+	    
+	    return s.toString();    
+	  }
+
   protected String genGeneralizationSection() {
     StringBuilder s = new StringBuilder();
     
@@ -651,7 +674,7 @@ protected String genCardinalityInstantiationSection() {
       if (c.getESuperTypes() != null && c.getESuperTypes().size() > 0) 
         s.append("(Instances, Size, MaxId, Attributes):-\n\t");
       else 
-        s.append("(Instances, Size, _, Attributes):-\n\t");
+        s.append("(Instances, Size, _, Attributes, Strings):-\n\t");
       s.append("length(Instances, Size),\n\t");
       if (c.getESuperTypes() != null && c.getESuperTypes().size() > 0) {
         s.append("(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), param(MaxId) do\n\t\t");
@@ -660,7 +683,7 @@ protected String genCardinalityInstantiationSection() {
         s.append("{oid:Integer1");
       }
       else {
-        s.append("(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), for(N, 1, Size) do\n\t\t");
+        s.append("(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), fromto([],StrIn,StrOut,Strings), for(N, 1, Size) do\n\t\t");
         s.append("Xi=");
         s.append(c.getName().toLowerCase());
         s.append("{oid:N");
@@ -669,11 +692,15 @@ protected String genCardinalityInstantiationSection() {
       List<EAttribute> atList = emfModelReader.getClassAttributes(c);
       int i = 1;
       for (EAttribute at : atList) { 
-        s.append(",");
-        s.append(at.getName());
-        s.append(":");
-        s.append(getStandardTypeName(at.getEAttributeType().getInstanceClass().getSimpleName()));
-        s.append(++i);
+			s.append(",");
+			s.append(at.getName());
+			s.append(":");
+			if (at.getEAttributeType().getInstanceClassName().equals("java.lang.String")) {
+				s.append("Str");
+			} else {
+				s.append("Int");
+			}
+			s.append(++i);
       }
       if (c.getESuperTypes() != null && c.getESuperTypes().size() > 0)
         s.append("}, Integer1::1..MaxId, ");
@@ -681,34 +708,48 @@ protected String genCardinalityInstantiationSection() {
         s.append("}, ");
       i = 1;
       for (EAttribute at : atList) { 
-        s.append(getStandardTypeName(at.getEAttributeType().getInstanceClass().getSimpleName()));
-        s.append(++i);
-        s.append("::");        
-        s.append(elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName()));
-        s.append(", ");
+    	  if (at.getEAttributeType().getInstanceClassName().equals("java.lang.String")) {
+  	    	++i;
+	    	s.append("str_len(Str" + i + "," + "Int" + i +"),\n\t\t");
+	    	s.append("Int" + i + " :: 0..50,\n\t\t");
+    	  } else {
+  	    	s.append("Int");
+  	    	s.append(++i);
+  	    	s.append("#::");        
+  	    	s.append(elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName()));
+  	    	s.append(",\n\t\t ");
+    	  }
       }
-      s.append("\n\t\t");
+      
 
+      
+      
       if (c.getESuperTypes() != null && c.getESuperTypes().size() > 0)
         s.append("append([Integer1");
       else
         s.append("append([N");
       i = 1;
       for (EAttribute at : atList) { 
-        s.append(",");
-        s.append(getStandardTypeName(at.getEAttributeType().getInstanceClass().getSimpleName()));  
-        s.append(++i);
+		  s.append(",");
+		  s.append("Int");
+    	  s.append(++i);
       }
-      s.append("],AtIn, AtOut)).\n\n");
+      s.append("],AtIn, AtOut),\n\t\t");
+      
+      s.append("append([");
+      i = 1;
+      boolean f = true;
+      for (EAttribute at : atList) { 
+    	  ++i;
+    	  if (at.getEAttributeType().getInstanceClassName().equals("java.lang.String")) {
+    		  if (f) f = false; else s.append(",");
+    		  s.append("Str" + i);
+    	  }
+      }
+      s.append("],StrIn, StrOut)).\n\n");
     }
-    for (String cName : cListNames) {
-      s.append("differentOids");
-      s.append(cName);
-      s.append("(Instances) :- differentOids(Instances).\n");
-      s.append("orderedInstances");
-      s.append(cName);
-      s.append("(Instances) :- orderedInstances(Instances).\n");      
-    }    
+
+   
     for (EClass c : cList) {
       List<EClass> subTypes = emfModelReader.getClassSubtypes(cList, c);
       if (subTypes != null && subTypes.size() > 0)
@@ -761,16 +802,7 @@ protected String genCardinalityInstantiationSection() {
       s.append(as.getDestinationEnd().getEType().getName());
       s.append(",\n\t\tappend([ValuePart1, ValuePart2],AtIn, AtOut)).\n");
     }    
-    for (String asName : asListNames) {
-      s.append("differentLinks");
-      s.append(asName.toLowerCase());
-      s.append("(X):- differentLinks(X).\n");
-    }    
-    for (String asName : asListNames) {
-      s.append("orderedLinks");
-      s.append(asName.toLowerCase());
-      s.append("(X):- orderedLinks(X).\n");
-    }    
+    
     for (EAssociation as : asList) {
       s.append("cardinalityLinks");
       s.append(as.getName().toLowerCase());
