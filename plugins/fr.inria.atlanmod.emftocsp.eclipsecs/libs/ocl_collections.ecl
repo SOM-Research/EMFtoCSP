@@ -294,7 +294,7 @@ ocl_set_symmetricDifference(Set1, Set2, Result) :-
 % holds other types of data that are stored as Prolog lists, the results of 
 % these operations are impredictable.
 
-delay ocl_flatten(X, _) if nonground(X).
+delay ocl_set_flatten(X, _) if var(X).
 ocl_set_flatten(Set, Result) :- 
    flatten(Set, Result).
 
@@ -438,7 +438,7 @@ ocl_bag_excluding([First|Rest], Obj, Result) :-
 % holds other types of data that are stored as Prolog lists, the results of 
 % these operations are impredictable.
 
-delay ocl_bag_flatten(X,_) if nonground(X).
+delay ocl_bag_flatten(X,_) if var(X).
 ocl_bag_flatten(Bag, Result) :- 
    flatten(Bag, Result). 
        
@@ -514,7 +514,7 @@ ocl_seq_union(Seq1, Seq2, Result) :-
 % holds other types of data that are stored as Prolog lists, the results of 
 % these operations are impredictable.
 
-delay ocl_seq_flatten(X, _) if nonground(X).
+delay ocl_seq_flatten(X, _) if var(X).
 ocl_seq_flatten(Seq, Result) :- 
    flatten(Seq, Result). 
 
