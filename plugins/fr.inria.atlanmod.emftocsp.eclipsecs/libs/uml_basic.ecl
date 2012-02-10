@@ -80,7 +80,7 @@ countOidInList( OidList, Oid, Result ) :-
 
 differentOids(Instances):-
    getOidList(Instances, OidList),
-   alldifferent(OidList). 
+   ic_global:alldifferent(OidList). 
 
 %orderedInstances(Instances) :-
 %   All instances of a class must be assigned in increasing order
@@ -91,11 +91,8 @@ orderedInstances(Instances) :-
   getOidList(Instances, OidList),
   % Oids should fulfill the #< relation
   orderedList(#<, OidList).
-
-% STRING: disabled
-%,
-%  % Attributes should fulfill a less restrictive <= relation
-%  orderedList(orderForAttributes, Instances).
+%TODO: need to reconsider orderForAttributes - for various examples, the overhead is to big
+% , orderedList(orderForAttributes, Instances).
 
 %orderForAttributes(ObjectA, ObjectB) :-
 %   Constrain ObjectA to be less or equal than ObjectB, according to some order.
@@ -208,17 +205,24 @@ linksConstraintMultiplicities(Instances, Assoc, RoleA, RoleB) :-
   nth1(ClassIndexB, Instances, OClassB),
   getPartList(LAssoc, RoleIndexA, LA),
   getPartList(LAssoc, RoleIndexB, LB),
-  linksConstraintMultiplicities1(OClassA,MinB,MaxB,LA),
-  linksConstraintMultiplicities1(OClassB,MinA,MaxA,LB),
+  linksConstraintMultiplicities4(OClassA,MinA,MaxA,LA,OClassB,MinB,MinB,LB),
+% lcm1 is subsumed by lcm3
+%  linksConstraintMultiplicities1(OClassA,MinB,MaxB,LA),
+%  linksConstraintMultiplicities1(OClassB,MinA,MaxA,LB),
   linksConstraintMultiplicities2(MaxB,LA),
   linksConstraintMultiplicities2(MaxA,LB),
   linksConstraintMultiplicities3(OClassA,MinB,MaxB,LA),
   linksConstraintMultiplicities3(OClassB,MinA,MaxA,LB).
 
+
 % helper for linksConstraintMultiplicities 
 % check multiplicities for ground link end list
-delay linksConstraintMultiplicities1(_,_,_,LA) if nonground(LA).
+
+% obsolete
+linksConstraintMultiplicities1(_,0,"*",_) :- !.
 linksConstraintMultiplicities1(OClassA,MinB,MaxB,LA) :-
+  ground(LA),
+  !,
   ( foreach(Obj, OClassA), 
     param(MinB, MaxB, LA) 
     do
@@ -227,28 +231,86 @@ linksConstraintMultiplicities1(OClassA,MinB,MaxB,LA) :-
       Size #>= MinB, 
       (MaxB  \= "*" -> Size #=< MaxB;  true)
   ).
+linksConstraintMultiplicities1(OClassA,MinB,MaxB,LA) :-
+  % nonground LA
+  suspend(linksConstraintMultiplicities1(OClassA,MinB,MaxB,LA),0,LA->bound). 
+
 
 % helper for linksConstraintMultiplicities 
 % pose global constraint on upper bound
 linksConstraintMultiplicities2("*",_) :- !.
 linksConstraintMultiplicities2(MaxB,LA) :-
-      ic_global:alldifferent(LA,MaxB).
+	%printf("ic_global:alldifferent(%w,%w)",[LA,MaxB]),nl,
+	ic_global:alldifferent(LA,MaxB).
 
-% helper for linksConstraintMultiplicities 
-% pose global constraint for the special case N..N 
+
+
+%% % helper for linksConstraintMultiplicities 
+%% % pose global constraint for the special case N..N 
+
+%% linksConstraintMultiplicities3(OClassA,1,1,LA) :-
+%%   !,
+%%   getOidList(OClassA,OidList),
+%%   ic_global:sorted(LA,OidList).
+  
+
 linksConstraintMultiplicities3(OClassA,N,N,LA) :-
   !,
   ( foreach(Obj, OClassA), 
     param(LA,N) 
     do
-      getOid(Obj, Oid),
+        getOid(Obj, Oid),
+	%printf("ic_global:occurrences(%w,%w,%w)",[Oid,LA,N]),nl,
       ic_global:occurrences(Oid,LA,N)
   ).
-linksConstraintMultiplicities3(_,_,_,_).
 
-% differentLinks(LinkList)
-%    All links in an association must have at least a different participant
-%    (except for isUnique associations)
+linksConstraintMultiplicities3(OClassA,Min,Max,LA) :-
+  length(LA,N),
+  (Max == "*" -> Max1 = N; Max1 = Max), 
+  ( foreach(Obj, OClassA),fromto([],In,Out,Constraints),param(Min,Max1) 
+    do
+        getOid(Obj, Oid),
+	Out=[gcc(Min,Max1,Oid)|In]
+  ),
+  reverse(Constraints,ConstraintsR),
+  % printf("ic_global_gac:gcc(%w)", [ConstraintsR]),nl,
+  ic_global_gac:gcc(ConstraintsR,LA).
+
+%% linksConstraintMultiplicities3(OClassA,1,_,LA) :-
+%%  !,
+%%  ( foreach(Obj, OClassA), 
+%%     param(LA) 
+%%     do
+%%         getOid(Obj, Oid),
+%% 	(foreach(LOid,LA),fromto(0,In,Out,1),param(Oid) do #=(Oid,LOid,Eq),ic:or(In,Eq,Out))
+%%   ).
+%% linksConstraintMultiplicities3(_,_,_,_).
+
+
+linksConstraintMultiplicities4(OClassA,_,_,LA,N,N,_,_) :-
+	!,
+	linksConstraintMultiplicitiesAux(OClassA,N,LA).
+
+linksConstraintMultiplicities4(_,N,N,_,OClassB,_,_,LB) :-
+	!,
+	linksConstraintMultiplicities4Aux(OClassB,N,LB).
+
+linksConstraintMultiplicities4(_,_,_,LA,_,_,_,_) :-
+	printf("ic_global:ordered(=<, %w)",[LA]),nl,
+	ic_global:ordered(=<, LA).
+
+linksConstraintMultiplicities4Aux(OClassA,N,LA) :-
+  !,
+  length(OClassA,LOClassA),
+  length(LA,LLA),
+  LLA is LOClassA * N,
+  N1 is LOClassA - 1,
+  ( count(I,0,N1), foreach(Obj,OClassA),param(LA,N) do 
+      getOid(Obj,Oid),
+      N2 is N - 1,
+      ( count(J,0,N2),param(I,Oid,LA,N) do
+          K is I * N + J,
+	  listut:nth0(K,LA,Oid) ) ).
 
 differentLinks(LinkList):- 
   differentList(differenceForLinks, LinkList).
@@ -274,10 +336,30 @@ differenceForLinks(LinkA, LinkB) :-
 %    This restriction is imposed for efficiency reasons to avoid
 %    exploring all possible permutations of links within an association
 
-orderedLinks(LinkList) :-
-   orderedList(orderForLinks, LinkList).
+orderedLinks(Instances,Assoc) :- 
+  index(Assoc, IndexAssoc),
+  nth1(IndexAssoc, Instances, LAssoc),
 
-% orderForLinks(LinkA, LinkB) :-
+  %% % Get the minimum and maximum cardinalities for both ends
+  %% % of the association
+  roleIndex(Assoc,RoleA,1),
+  roleIndex(Assoc,RoleB,2),
+  roleMin(Assoc, RoleA, MinA),
+  roleMax(Assoc, RoleA, MaxA),
+  roleMin(Assoc, RoleB, MinB),
+  roleMax(Assoc, RoleB, MaxB),
+  orderedLinks1(LAssoc, MinA,MaxA,MinB,MaxB).
+
+
+orderedLinks1(LAssoc,N,N,_,_) :-
+	!,
+	orderedList(orderForLinks2, LAssoc).
+
+orderedLinks1(LAssoc,_,_,_,_) :-
+	!,
+	orderedList(orderForLinks1, LAssoc).
+
+% orderForLinks1(LinkA, LinkB) :-
 %    Constrain LinkA to be strictly less than LinkB. Let p(i,L) be the i-th 
 %    participant of L, then LinkA is less than LinkB if:
 %      ( p(1,LA) < p(1,LB) ) OR
@@ -285,9 +367,7 @@ orderedLinks(LinkList) :-
 %      ( p(1,LA) = p(1,LB) AND p(2,LA) = p(2,LB) AND p(3,LA) < p(3,LB) ) OR
 %      ...
 
-
-
-orderForLinks(LinkA, LinkB) :-
+orderForLinks1(LinkA, LinkB) :-
   ( foreacharg(ParticipantA, LinkA), 
     foreacharg(ParticipantB, LinkB),
     fromto(0, InOrder, OutOrder, Result),
@@ -310,6 +390,31 @@ orderForLinks(LinkA, LinkB) :-
   ),
   Result #=1.
 
+% orderForLinks2(LinkA, LinkB) --- reverse components
+orderForLinks2(LinkA, LinkB) :-
+  (foreacharg(ParticipantA,LinkA),fromto([],X,Y,LinkAReversed) do Y = [ParticipantA|X]),
+  (foreacharg(ParticipantB,LinkB),fromto([],X,Y,LinkBReversed) do Y = [ParticipantB|X]),
+  ( foreach(ParticipantA, LinkAReversed), 
+    foreach(ParticipantB, LinkBReversed),
+    fromto(0, InOrder, OutOrder, Result),
+    fromto(1, InEquals, OutEquals, _)
+    do
+      #<(ParticipantA, ParticipantB, Less),
+      #=(ParticipantA, ParticipantB, Equals),              
+
+      % InEquals = participants 1 to I-1 are equal
+      % OutEquals should extend it up to the I-th participant    
+      % OutEquals = InEquals /\ Equals
+      ic:and(InEquals, Equals, OutEquals),      
+
+      % InOrder = participants 1 to I-1 are ordered
+      % OutOrder should extend it up to the I-th participant
+      % OutOrder = InOrder \/ (InEquals /\ Less) 
+      ic:and(InEquals, Less, Aux),
+
+      ic:or(InOrder, Aux, OutOrder) 
+  ),
+  Result #=1.
 
 
 %------------------------------------------------------------------------------
@@ -365,7 +470,7 @@ disjointOids( TypeList ) :-
             append( OidList, OidIn, OidOut)          
           ) ),
         flatten( OidList, AllOids),
-        alldifferent( AllOids ).       
+        ic_global:alldifferent( AllOids ).       
 
 %------------------------------------------------------------------------------
 %
