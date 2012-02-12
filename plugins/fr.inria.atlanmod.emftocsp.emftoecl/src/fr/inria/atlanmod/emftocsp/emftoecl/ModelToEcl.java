@@ -59,7 +59,7 @@ public class ModelToEcl {
   }
 
   protected String genLibsSection() {
-    return ":-lib(ic).\nlib(ic_global).\nlib(ic_global_gac).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).";
+    return ":-lib(ic).\n:-lib(ic_global).\n:-lib(ic_global_gac).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).";
     // TODO (next version): include CHR and String reasoning rules
   }
   
