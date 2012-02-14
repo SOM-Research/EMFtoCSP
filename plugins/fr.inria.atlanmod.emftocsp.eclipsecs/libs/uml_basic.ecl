@@ -253,6 +253,7 @@ linksConstraintMultiplicities2(MaxB,LA) :-
 %%   getOidList(OClassA,OidList),
 %%   ic_global:sorted(LA,OidList).
   
+linksConstraintMultiplicities3(_,_,_,[]) :- !.
 
 linksConstraintMultiplicities3(OClassA,N,N,LA) :-
   !,
