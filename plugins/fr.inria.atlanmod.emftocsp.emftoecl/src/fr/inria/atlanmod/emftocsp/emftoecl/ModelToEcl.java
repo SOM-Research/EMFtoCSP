@@ -412,7 +412,8 @@ protected String genCardinalityInstantiationSection() {
 	    s.deleteCharAt(s.length() - 2);
 	    s.append("],\n\t");
 	    s.append("flatten(AllAttributes, Attributes),\n\t");
-	    s.append("labeling(Attributes),\n");
+        s.append("search(Attributes,0,first_fail, indomain, complete, []),\n");
+
 
 	    return s.toString();    
 	  }
