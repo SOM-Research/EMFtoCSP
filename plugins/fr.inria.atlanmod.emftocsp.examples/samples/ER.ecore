@@ -23,10 +23,11 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Entity">
     <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
-      <details key="constraints" value="EAN"/>
+      <details key="constraints" value="EAN KEY"/>
     </eAnnotations>
     <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
       <details key="EAN" value="attrs->forAll(a1 : Attribute, a2 : Attribute | a1.name = a2.name implies a1 = a2)"/>
+      <details key="KEY" value="attrs->exists(a : Attribute | a.isKey = true)"/>
     </eAnnotations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBigInteger"/>
@@ -35,7 +36,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="ends" ordered="false" upperBound="-1"
         eType="#//RelshipEnd" eOpposite="#//RelshipEnd/type"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="attrs" ordered="false"
-        upperBound="-1" eType="#//Attribute" containment="true" eOpposite="#//Attribute/entity"/>
+        lowerBound="1" upperBound="-1" eType="#//Attribute" containment="true" eOpposite="#//Attribute/entity"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Relship">
     <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
