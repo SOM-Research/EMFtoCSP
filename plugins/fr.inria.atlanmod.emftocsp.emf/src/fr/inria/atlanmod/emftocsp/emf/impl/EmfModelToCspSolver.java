@@ -41,6 +41,11 @@ public class EmfModelToCspSolver extends ModelToCspSolver<Resource> {
 	public Resource getModel() {
 		return emfModelResource;
 	}
+	
+	@Override
+	public String getModelLocation() {
+	  return emfModelResource.getURI().path();
+	}
 
   @Override
   public IModelReader<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation> getModelReader() {

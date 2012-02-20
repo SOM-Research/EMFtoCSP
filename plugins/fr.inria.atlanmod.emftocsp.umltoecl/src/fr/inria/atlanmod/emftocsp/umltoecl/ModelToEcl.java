@@ -22,6 +22,7 @@ import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.resource.UMLResource;
 
+import fr.inria.atlanmod.emftocsp.ILogger;
 import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.impl.LackOfConstraintsRedundanciesModelProperty;
@@ -44,8 +45,9 @@ public class ModelToEcl {
   List<String> constraintsNames;
   Map<String, String> elementsDomain;
   List<IModelProperty> properties;
+  ILogger logger;
 
-  public ModelToEcl(IModelReader<UMLResource, Package, Class, Association, Property, Operation> umlModelReader, Map<String, String> elementsDomain, List<IModelProperty> properties, List<String> constraintsNames) {
+  public ModelToEcl(IModelReader<UMLResource, Package, Class, Association, Property, Operation> umlModelReader, Map<String, String> elementsDomain, List<IModelProperty> properties, List<String> constraintsNames, ILogger logger) {
     this.umlModelReader = umlModelReader;
     cList = umlModelReader.getClasses();
     pList = umlModelReader.getPackages();
@@ -55,9 +57,12 @@ public class ModelToEcl {
     this.properties = properties;
     this.elementsDomain = elementsDomain;
     this.constraintsNames = constraintsNames;    
+    this.logger = logger;
   }
 
   protected String genLibsSection() {
+    //How to use the logger
+    //logger.writeInfoMessage(this.getClass().toString(), "Log message");
     return ":-lib(ic).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).\n";   
   }
   

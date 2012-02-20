@@ -31,6 +31,8 @@ public interface IModelToCspSolver<R> {
   
 	public String getModelFileName();
 	
+	public String getModelLocation();
+	
 	public IModelReader<R, ?, ?, ?, ?, ?> getModelReader();
 
   public IOclParser<?, R> getOclParser();
@@ -64,4 +66,8 @@ public interface IModelToCspSolver<R> {
   public boolean solveModel(List<File> importLibs) throws Exception;	
   
   public Object getSolverEvaluationResult() throws Exception;
+  
+  public void setLogger(ILogger logger);
+  
+  public ILogger getLogger();
 }

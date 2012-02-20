@@ -12,10 +12,13 @@ package fr.inria.atlanmod.emftocsp.ui.wizards.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.SWT;
@@ -33,10 +36,12 @@ import fr.inria.atlanmod.emftocsp.ui.wizards.IWizardNavigation;
 public abstract class ValidationWizard extends Wizard {
 	IWizardNavigation wizardNavigation;
 	IModelToCspSolver<?> modelSolver;
+	String logFileName;
 	
 	public ValidationWizard(IWizardNavigation wizardNavigation, IModelToCspSolver<?> modelSolver) {
 		this.wizardNavigation = wizardNavigation;
-		this.modelSolver = modelSolver;
+		this.modelSolver = modelSolver;		
+		logFileName = modelSolver.getModelLocation() + modelSolver.getModelFileName() + ".log";
 	}
 
 	@Override
@@ -47,8 +52,28 @@ public abstract class ValidationWizard extends Wizard {
 	}
 	
 	@Override
-	public boolean performFinish() {
+	public boolean performCancel() {
+	  if (modelSolver.getLogger() != null) {
+	    modelSolver.getLogger().writeInfoMessage(this.getClass().toString(), "Wizard cancelled by the user");	    
+	    if (modelSolver.getResultLocation() != null) {
+        logFileName = modelSolver.getResultLocation().getRawLocation().append(modelSolver.getModelFileName() + ".log").toOSString();
+        modelSolver.getLogger().writeInfoMessage(this.getClass().toString(), "Closing EMFtoCSP");
+	      modelSolver.getLogger().close(logFileName);
+  	    try {
+          modelSolver.getResultLocation().refreshLocal(IResource.DEPTH_INFINITE, null);
+	      }
+	      catch (Exception e) {
+	        e.printStackTrace();
+	      }
+	    }
+	  }
+	  return true;
+	}
+	
+	@Override
+	public boolean performFinish() {  
 	  try {
+	    logFileName = modelSolver.getResultLocation().getRawLocation().append(modelSolver.getModelFileName() + ".log").toOSString();
       File importsFolder = new File(FileLocator.toFileURL(FrameworkUtil.getBundle(fr.inria.atlanmod.emftocsp.eclipsecs.EclipseSolver.class).getEntry("/libs")).toURI()); //$NON-NLS-1$
       File[] libs = importsFolder.listFiles(
           new FilenameFilter() {
@@ -63,24 +88,27 @@ public abstract class ValidationWizard extends Wizard {
       String msgTitle = ""; //$NON-NLS-1$
       String message = ""; //$NON-NLS-1$
 	    if (modelSolver.solveModel(libList)) {
-	      modelSolver.getResultLocation().refreshLocal(IResource.DEPTH_INFINITE, null);
 	      MessageBox messageBox = new MessageBox(this.getShell(), SWT.ICON_INFORMATION | SWT.OK);
 	      msgTitle = Messages.ValidationWizard_0;
 	      message = Messages.ValidationWizard_1;
 	      messageBox.setText(msgTitle);
 	      messageBox.setMessage(message);
 	      messageBox.open();
+	      modelSolver.getLogger().writeInfoMessage(this.getClass().toString(), "Closing EMFtoCSP");
+        modelSolver.getLogger().close(logFileName);
+        modelSolver.getResultLocation().refreshLocal(IResource.DEPTH_INFINITE, null);
 	      return true;
 	    }
-	    else {
-	      msgTitle = Messages.ValidationWizard_2;
-        message = Messages.ValidationWizard_3;	      
-	      MessageBox messageBox = new MessageBox(this.getShell(), SWT.ICON_WARNING | SWT.OK);
-	      messageBox.setText(msgTitle);
-	      messageBox.setMessage(message);
-	      messageBox.open();    
-	      return false;
-	    }
+      msgTitle = Messages.ValidationWizard_2;
+      message = Messages.ValidationWizard_3;	      
+      MessageBox messageBox = new MessageBox(this.getShell(), SWT.ICON_WARNING | SWT.OK);
+      messageBox.setText(msgTitle);
+      messageBox.setMessage(message);
+      messageBox.open();    
+//      modelSolver.getLogger().writeInfoMessage(this.getClass().toString(), "Closing EMFtoCSP");
+//      modelSolver.getLogger().close(logFileName);
+//      modelSolver.getResultLocation().refreshLocal(IResource.DEPTH_INFINITE, null);
+      return false;
 	  }
 	  catch(Exception e) {
       e.printStackTrace();
@@ -90,8 +118,16 @@ public abstract class ValidationWizard extends Wizard {
       messageBox.setText(msgTitle);
       messageBox.setMessage(message);
       messageBox.open();    
+      modelSolver.getLogger().writeInfoMessage(this.getClass().toString(), "Closing EMFtoCSP");
+      modelSolver.getLogger().close(logFileName);     
+      try {
+        modelSolver.getResultLocation().refreshLocal(IResource.DEPTH_INFINITE, null);
+      } 
+      catch (CoreException ex) {
+        ex.printStackTrace();
+      }
+      return true;
 	  }
-		return true;
 	}
 	
 	@Override

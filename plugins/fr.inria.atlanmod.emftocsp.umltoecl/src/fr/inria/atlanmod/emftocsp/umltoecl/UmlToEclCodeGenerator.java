@@ -63,7 +63,7 @@ public class UmlToEclCodeGenerator extends UmlCspCodeGenerator {
     StringBuilder s = new StringBuilder();
     try {
       List<String> constraintsNames = GetOclParser().getModelConstraintsNames(GetModel(), getOclDocument());
-      ModelToEcl umlTranslator = new ModelToEcl(umlModelReader, modelElementsDomain, properties, constraintsNames);
+      ModelToEcl umlTranslator = new ModelToEcl(umlModelReader, modelElementsDomain, properties, constraintsNames, modelSolver.getLogger());
       
       s.append(umlTranslator.genLibsSection());
       s.append("\n");
@@ -119,7 +119,7 @@ public class UmlToEclCodeGenerator extends UmlCspCodeGenerator {
     HashMap<String, String> ctfpMap = new HashMap<String, String>();
 
     try {
-      OclToEcl oclVisitor = OclToEcl.getInstance();                
+      OclToEcl oclVisitor = OclToEcl.getInstance(modelSolver.getLogger());                
       List<Constraint> cList = oclParser.parseModelConstraints(modelResource, oclDocument);
       for (Constraint c : cList) {
         List<String> keywords = c.getKeywords();

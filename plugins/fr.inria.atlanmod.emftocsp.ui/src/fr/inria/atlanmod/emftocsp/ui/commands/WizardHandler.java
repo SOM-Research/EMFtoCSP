@@ -37,6 +37,7 @@ import fr.inria.atlanmod.emftocsp.umltoecl.UmlToEclCodeGenerator;
 import fr.inria.atlanmod.emftocsp.emftoecl.EmfToEclCodeGenerator;
 
 import fr.inria.atlanmod.emftocsp.eclipsecs.EclipseSolver;
+import fr.inria.atlanmod.emftocsp.impl.FileLogger;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
@@ -76,6 +77,10 @@ public class WizardHandler extends AbstractHandler implements IHandler {
     modelSolver.setSolver(solver);
     modelSolver.setCspCodeGenerator(new EmfToEclCodeGenerator(modelSolver));
     
+    modelSolver.setLogger(new FileLogger());
+//    modelSolver.setLogger(new FileLogger(modelFile.getRawLocation().toOSString().concat(".emftocsp.log")));
+    modelSolver.getLogger().writeInfoMessage(this.getClass().toString(), "Starting EMFtoCSP GUI");
+       
     ValidationWizard wizard = new ModelSelectedWizard(modelSolver);
     WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
     dialog.open();

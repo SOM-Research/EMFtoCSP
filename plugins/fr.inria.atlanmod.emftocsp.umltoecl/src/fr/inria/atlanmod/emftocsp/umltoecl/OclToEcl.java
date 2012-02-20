@@ -49,6 +49,8 @@ import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.SendSignalAction;
 import org.eclipse.uml2.uml.State;
 
+import fr.inria.atlanmod.emftocsp.ILogger;
+
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
@@ -63,20 +65,22 @@ public class OclToEcl extends AbstractVisitor<String, Classifier, Operation, Pro
   Stack<String> varStack = null;
   private final UMLReflection<?, Classifier, Operation, Property, EnumerationLiteral, Parameter, State, CallOperationAction, SendSignalAction, Constraint> uml;
   private static String XML_NULL_PLACEHOLDER = "NONE"; //$NON-NLS-1$  
+  ILogger logger;
 
-  public static OclToEcl getInstance() {
+  public static OclToEcl getInstance(ILogger logger) {
     Environment<Package, Classifier, Operation, Property, EnumerationLiteral, Parameter, State, CallOperationAction, SendSignalAction, Constraint, Class, EObject> auxEnv = OCL.newInstance().getEnvironment();
-    return new OclToEcl(auxEnv);
+    return new OclToEcl(auxEnv, logger);
   }
 
   public static OclToEcl getInstance(
-      Environment<?, Classifier, Operation, Property, EnumerationLiteral, Parameter, State, CallOperationAction, SendSignalAction, Constraint, ?, ?> env) {
-    return new OclToEcl(env);
+      Environment<?, Classifier, Operation, Property, EnumerationLiteral, Parameter, State, CallOperationAction, SendSignalAction, Constraint, ?, ?> env, ILogger logger) {
+    return new OclToEcl(env, logger);
   }  
 
-  protected OclToEcl(Environment<?, Classifier, Operation, Property, EnumerationLiteral, Parameter, State, CallOperationAction, SendSignalAction, Constraint, ?, ?> env) {
+  protected OclToEcl(Environment<?, Classifier, Operation, Property, EnumerationLiteral, Parameter, State, CallOperationAction, SendSignalAction, Constraint, ?, ?> env, ILogger logger) {
     this.env = env;
     uml = (env == null) ? null : env.getUMLReflection();
+    this.logger = logger;
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IPath;
 
 import fr.inria.atlanmod.emftocsp.ICspCodeGenerator;
 import fr.inria.atlanmod.emftocsp.ICspSolver;
+import fr.inria.atlanmod.emftocsp.ILogger;
 import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
@@ -38,6 +39,7 @@ public abstract class ModelToCspSolver<R> implements IModelToCspSolver<R> {
   List<IModelProperty> modelProperties;
   ICspSolver solver;
   String modelFilename;
+  ILogger logger;
 
   @Override
   public abstract void setModel(R modelResource);
@@ -54,6 +56,9 @@ public abstract class ModelToCspSolver<R> implements IModelToCspSolver<R> {
   public String getModelFileName() {
     return modelFilename;
   }
+  
+  @Override
+  public abstract String getModelLocation();
   
   @Override
   public abstract IModelReader<R, ?, ?, ?, ?, ?> getModelReader();
@@ -139,5 +144,16 @@ public abstract class ModelToCspSolver<R> implements IModelToCspSolver<R> {
   public Object getSolverEvaluationResult() throws Exception {
     return solver.getResult();
   }
+  
+  @Override
+  public void setLogger(ILogger logger) {
+    this.logger = logger;
+  }
+
+  @Override
+  public ILogger getLogger() {
+    return logger;
+  }
+  
   
 }

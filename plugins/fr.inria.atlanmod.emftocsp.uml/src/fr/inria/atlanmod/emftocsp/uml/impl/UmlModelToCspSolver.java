@@ -43,6 +43,11 @@ public class UmlModelToCspSolver extends ModelToCspSolver<UMLResource> {
 	public UMLResource getModel() {
 	  return umlModelResource;
 	}
+	
+  @Override
+  public String getModelLocation() {
+    return umlModelResource.getURI().path();
+  }	
 
   @Override
   public IModelReader<UMLResource, Package, Class, Association, Property, Operation> getModelReader() {
