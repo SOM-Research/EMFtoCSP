@@ -74,7 +74,7 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
     StringBuilder s = new StringBuilder();
     try {
       List<String> constraintsNames = getOclParser().getModelInvariantNames(getModel(), getOclDocument());
-      ModelToEcl emfTranslator = new ModelToEcl(emfModelReader, modelElementsDomain, properties, constraintsNames);
+      ModelToEcl emfTranslator = new ModelToEcl(emfModelReader, modelElementsDomain, properties, constraintsNames, modelSolver.getLogger());
       
       s.append(emfTranslator.genLibsSection());
       s.append("\n");
@@ -137,7 +137,7 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
     	  OCL ocl = org.eclipse.ocl.ecore.OCL.newInstance();
           OCLHelper<EClassifier, EOperation, EStructuralFeature, Constraint> helper = ocl.createOCLHelper();
         
-      OclToEcl oclVisitor = OclToEcl.getInstance();                
+      OclToEcl oclVisitor = OclToEcl.getInstance(modelSolver.getLogger());                
       List<Constraint> cList = oclParser.parseModelConstraints(modelResource, oclDocument);
       for (Constraint c : cList) {
         if (!c.getStereotype().equalsIgnoreCase("precondition") && !c.getStereotype().equalsIgnoreCase("postcondition")) {

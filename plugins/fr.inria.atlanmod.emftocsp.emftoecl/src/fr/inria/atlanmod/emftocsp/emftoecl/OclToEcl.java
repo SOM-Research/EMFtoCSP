@@ -51,6 +51,8 @@ import org.eclipse.ocl.utilities.PredefinedType;
 import org.eclipse.ocl.utilities.TypedElement;
 import org.eclipse.ocl.utilities.UMLReflection;
 
+import fr.inria.atlanmod.emftocsp.ILogger;
+
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
@@ -64,21 +66,23 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
   int counter;
   Stack<String> varStack = null;
   private final UMLReflection<?, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint> uml;
-  private static String XML_NULL_PLACEHOLDER = "NONE";   
+  private static String XML_NULL_PLACEHOLDER = "NONE"; 
+  ILogger logger;
 
-  public static OclToEcl getInstance() {
-    Environment<EPackage, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, EClass, EObject> auxEnv = EcoreEnvironmentFactory.INSTANCE.createEnvironment();
-    return new OclToEcl(auxEnv);
+  public static OclToEcl getInstance(ILogger logger) {
+    Environment<EPackage, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, EClass, EObject> auxEnv = EcoreEnvironmentFactory.INSTANCE.createEnvironment();    
+    return new OclToEcl(auxEnv, logger);
   }
 
   public static OclToEcl getInstance(
-      Environment<?, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, ?, ?> env) {
-    return new OclToEcl(env);
+      Environment<?, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, ?, ?> env, ILogger logger) {
+    return new OclToEcl(env, logger);
   }  
 
-  protected OclToEcl(Environment<?, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, ?, ?> env) {
+  protected OclToEcl(Environment<?, EClassifier, EOperation, EStructuralFeature, EEnumLiteral, EParameter, EObject, CallOperationAction, SendSignalAction, Constraint, ?, ?> env, ILogger logger) {
     this.env = env;
     uml = (env == null) ? null : env.getUMLReflection();
+    this.logger = logger;
   }
 
   @Override
@@ -190,7 +194,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     oclTranslation.append("ocl_variable(Vars,");
     int index = varStack.search(v.getName());
     if (index < 0) {
-    	System.err.println("Internal error: Variable " + v.getName() + " not found");
+    	logger.writeErrorMessage(this.getClass().toString(), "Internal error: Variable " + v.getName() + " not found");
     }
     oclTranslation.append(index);
     oclTranslation.append(",Result).\n");
@@ -263,8 +267,6 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
 
   @Override
   public String visitIteratorExp(IteratorExp<EClassifier, EParameter> callExp) {
-    String res = null;
-	
     List<String> variableResults;
     EList<Variable<EClassifier, EParameter>> variables = callExp.getIterator();
 

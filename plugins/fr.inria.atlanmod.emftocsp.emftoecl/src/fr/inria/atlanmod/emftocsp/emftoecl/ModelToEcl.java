@@ -22,6 +22,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
 
+import fr.inria.atlanmod.emftocsp.ILogger;
 import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.emf.impl.EAssociation;
@@ -45,8 +46,9 @@ public class ModelToEcl {
   List<String> constraintsNames;
   Map<String, String> elementsDomain;
   List<IModelProperty> properties;
+  ILogger logger;
   
-  public ModelToEcl(IModelReader<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation> emfModelReader, Map<String, String> elementsDomain, List<IModelProperty> properties, List<String> constraintsNames) {
+  public ModelToEcl(IModelReader<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation> emfModelReader, Map<String, String> elementsDomain, List<IModelProperty> properties, List<String> constraintsNames, ILogger logger) {
     this.emfModelReader = emfModelReader;
     cList = emfModelReader.getClasses();
     pList = emfModelReader.getPackages();
@@ -56,6 +58,7 @@ public class ModelToEcl {
     this.properties = properties;
     this.elementsDomain = elementsDomain;
     this.constraintsNames = constraintsNames;
+    this.logger = logger;
   }
 
   protected String genLibsSection() {
