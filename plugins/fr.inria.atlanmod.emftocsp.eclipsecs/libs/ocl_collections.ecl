@@ -48,6 +48,13 @@
 % 
 %------------------------------------------------------------------------------
 
+delay ocl_obj_asSet(X,Y) if var(X).
+ocl_obj_asSet(ocl_undef,[]) :- !.
+ocl_obj_asSet([X],[X]) :- !.
+ocl_obj_asSet(X,[X]).
+
+
+
 % ocl_col_size( +Col, -Size ) :-
 %    Returns the number of elements in the collection
 
@@ -59,17 +66,21 @@ ocl_col_size(Col, Size) :-
 %    Tests if object Obj is inside Col. In that case, 
 %    Result = 1 if Obj is in Col, 0 otherwise.
 
-delay ocl_col_includes(X, _, _) if nonground(X).
-delay ocl_col_includes(_, Y, _) if nonground(Y).
+delay ocl_col_includes(X, _, _) if var(X).
+delay ocl_col_includes(_, Y, _) if var(Y).
+ocl_col_includes(_, ocl_undef, 0) :- !.
 ocl_col_includes(Col, Obj, Result) :- 
    Result::0..1,
-   ocl_mustBeObject(Obj, Object),
-   (member(Object, Col) -> Result = 1; Result = 0).  
+   (foreach(X,Col),fromto(0,In,Out,Result),param(Obj) do
+       ocl_obj_equals(Obj,X,B),
+       Out #= B or In).
   
 % ocl_col_excludes( +Col, +Obj, -Result ) :- 
 %    Tests if object Obj is inside Col. In that case, 
 %    Result = 1 if Obj is in Col, 1 otherwise.
 
+delay ocl_col_excludes(Col, Obj, Result) if var(Col).
+delay ocl_col_excludes(Col, Obj, Result) if var(Obj).
 ocl_col_excludes(Col, Obj, Result) :-
    Result::0..1,
    ocl_mustBeObject(Obj, Object),

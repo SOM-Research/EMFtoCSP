@@ -62,8 +62,7 @@ public class ModelToEcl {
   }
 
   protected String genLibsSection() {
-    return ":-lib(ic).\n:-lib(ic_global).\n:-lib(ic_global_gac).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).";
-    // TODO (next version): include CHR and String reasoning rules
+    return ":-lib(ic).\n:-lib(ic_global).\n:-lib(ic_global_gac).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).\n:-lib(ech).";
   }
   
   protected String genStructSection() {
@@ -242,8 +241,6 @@ protected String genCardinalityInstantiationSection() {
       s.append(emfModelReader.getBaseClass(c).getName());
       s.append(", At");
       s.append(c.getName());
-      s.append(", Str");
-      s.append(c.getName());
       s.append("),\n\t");
     }
     s.append("\n\t");    
@@ -415,7 +412,8 @@ protected String genCardinalityInstantiationSection() {
 	    s.deleteCharAt(s.length() - 2);
 	    s.append("],\n\t");
 	    s.append("flatten(AllAttributes, Attributes),\n\t");
-        s.append("search(Attributes,0,first_fail, indomain, complete, []),\n");
+        //s.append("search(Attributes,0,first_fail, indomain, complete, []),\n");
+        s.append("labeling(Attributes),\n\t");
 
 
 	    return s.toString();    
@@ -423,18 +421,7 @@ protected String genCardinalityInstantiationSection() {
 
   protected String genStringLabelingSection() {
 	    StringBuilder s = new StringBuilder();
-	    s.append("\tAllCharacters = [");
-	    for (String cName : cListNames) {
-	      s.append("Str");
-	      s.append(cName);
-	      s.append(", ");
-	    }    
-	    s.deleteCharAt(s.length() - 2);
-	    s.append("],\n\t");
-	    s.append("flatten(AllCharacters, Characters),\n\t");
-	    s.append("labeling(Characters).\n");
-	    
-	    
+		s.append("str_labeling.");
 	    return s.toString();    
 	  }
 
@@ -500,6 +487,20 @@ protected String genCardinalityInstantiationSection() {
         s.append("\",");
         s.append(++i);
         s.append(").\n");
+      }
+    }    
+    for (EClass c : cList) {
+      i = 1;
+      atList = emfModelReader.getClassAttributes(c);
+      for (EAttribute at : atList) { 
+        s.append("attType(\"");
+        s.append(c.getName());
+        s.append("\",\"");
+        s.append(at.getName());
+        s.append("\",\"");
+        s.append(at.getEAttributeType().getName());
+        s.append("\").\n");
+        ++i;
       }
     }    
     return s.toString();
@@ -678,7 +679,7 @@ protected String genCardinalityInstantiationSection() {
       if (c.getESuperTypes() != null && c.getESuperTypes().size() > 0) 
         s.append("(Instances, Size, MaxId, Attributes):-\n\t");
       else 
-        s.append("(Instances, Size, _, Attributes, Strings):-\n\t");
+        s.append("(Instances, Size, _, Attributes):-\n\t");
       s.append("length(Instances, Size),\n\t");
       if (c.getESuperTypes() != null && c.getESuperTypes().size() > 0) {
         s.append("(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), param(MaxId) do\n\t\t");
@@ -687,70 +688,71 @@ protected String genCardinalityInstantiationSection() {
         s.append("{oid:Integer1");
       }
       else {
-        s.append("(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), fromto([],StrIn,StrOut,Strings), for(N, 1, Size) do\n\t\t");
+        s.append("(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), for(N, 1, Size) do\n\t\t");
         s.append("Xi=");
         s.append(c.getName().toLowerCase());
         s.append("{oid:N");
       }
       
       List<EAttribute> atList = emfModelReader.getClassAttributes(c);
-      int i = 1;
+      List<EAttribute> atListNumeric = new ArrayList<EAttribute>();
       for (EAttribute at : atList) { 
+    	  if (! at.getEType().getInstanceClassName().contains("String") ) {
+    		  atListNumeric.add(at);
+    	  }
+      }
+      int i = 1;
+      for (EAttribute at : atList) {
+    	  	++i;
 			s.append(",");
 			s.append(at.getName());
 			s.append(":");
-			if (at.getEAttributeType().getInstanceClassName().equals("java.lang.String")) {
-				s.append("Str");
-			} else {
+			if (atListNumeric.contains(at)) {
 				s.append("Int");
+			} else {
+				s.append("Str");
 			}
-			s.append(++i);
+			s.append(i);
       }
       if (c.getESuperTypes() != null && c.getESuperTypes().size() > 0)
         s.append("}, Integer1::1..MaxId, ");
       else
         s.append("}, ");
       i = 1;
-      for (EAttribute at : atList) { 
-    	  if (at.getEAttributeType().getInstanceClassName().equals("java.lang.String")) {
-  	    	++i;
-	    	s.append("str_len(Str" + i + "," + "Int" + i +"),\n\t\t");
-	    	s.append("Int" + i + " :: 0..50,\n\t\t");
+      for (EAttribute at : atList) {
+    	  ++i;
+    	  if (atListNumeric.contains(at)) {
+		  	s.append("Int");
+	    	s.append(i);
+	    	s.append("#::");        
+	    	s.append(elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName()));
     	  } else {
-  	    	s.append("Int");
-  	    	s.append(++i);
-  	    	s.append("#::");        
-  	    	s.append(elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName()));
-  	    	s.append(",\n\t\t ");
+    		  s.append("str_len(Str");
+    		  s.append(i);
+    		  s.append(",");
+    		  s.append("LenStr" + i);
+    		  s.append("),");
+    		  s.append("LenStr" + i);
+    		  s.append("#::");
+    		  s.append(elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName()));
     	  }
+    	  s.append(",\n\t\t ");
       }
-      
 
-      
-      
       if (c.getESuperTypes() != null && c.getESuperTypes().size() > 0)
         s.append("append([Integer1");
       else
         s.append("append([N");
       i = 1;
-      for (EAttribute at : atList) { 
-		  s.append(",");
-		  s.append("Int");
-    	  s.append(++i);
-      }
-      s.append("],AtIn, AtOut),\n\t\t");
-      
-      s.append("append([");
-      i = 1;
-      boolean f = true;
-      for (EAttribute at : atList) { 
+      for (EAttribute at : atList) {
     	  ++i;
-    	  if (at.getEAttributeType().getInstanceClassName().equals("java.lang.String")) {
-    		  if (f) f = false; else s.append(",");
-    		  s.append("Str" + i);
+    	  if (atListNumeric.contains(at)) {
+    		  s.append(",");
+    		  s.append("Int");
+    		  s.append(i);
     	  }
       }
-      s.append("],StrIn, StrOut)).\n\n");
+      s.append("],AtIn, AtOut)).\n\n");
     }
 
    

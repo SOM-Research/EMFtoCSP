@@ -61,11 +61,11 @@ public interface IModelToCspSolver<R> {
 	
 	public ICspSolver getSolver();
 	
-	public boolean solveModel() throws Exception;
+	public boolean solveModel() throws ProcessingException ;
 
-  public boolean solveModel(List<File> importLibs) throws Exception;	
+  public boolean solveModel(List<File> importLibs) throws ProcessingException ;	
   
-  public Object getSolverEvaluationResult() throws Exception;
+  public Object getSolverEvaluationResult();
   
   public void setLogger(ILogger logger);
   

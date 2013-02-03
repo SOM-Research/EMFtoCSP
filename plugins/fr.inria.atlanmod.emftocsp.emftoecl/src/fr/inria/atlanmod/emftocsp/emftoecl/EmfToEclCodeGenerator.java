@@ -38,6 +38,7 @@ import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
 import fr.inria.atlanmod.emftocsp.IOclParser;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
 import fr.inria.atlanmod.emftocsp.emf.impl.EAssociation;
 import fr.inria.atlanmod.emftocsp.emf.impl.EmfCspCodeGenerator;
 import fr.inria.atlanmod.emftocsp.impl.LackOfConstraintsRedundanciesModelProperty;
@@ -56,7 +57,7 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
     
   @SuppressWarnings("unchecked")
   @Override
-  public String getCspCode() {
+  public String getCspCode() throws ProcessingException {
     setModel(modelSolver.getModel());
     setOclDocument(modelSolver.getConstraintsDocument());
     setModelElementsDomains(modelSolver.getModelElementsDomain());
@@ -70,9 +71,8 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
     return s.toString();
   }
   
-  private String translateEmfModel(IModelReader<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation> emfModelReader, Map<String, String> modelElementsDomain, List<IModelProperty> properties) {
+  private String translateEmfModel(IModelReader<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation> emfModelReader, Map<String, String> modelElementsDomain, List<IModelProperty> properties) throws ProcessingException {
     StringBuilder s = new StringBuilder();
-    try {
       List<String> constraintsNames = getOclParser().getModelInvariantNames(getModel(), getOclDocument());
       ModelToEcl emfTranslator = new ModelToEcl(emfModelReader, modelElementsDomain, properties, constraintsNames, modelSolver.getLogger());
       
@@ -120,11 +120,7 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
       s.append("\n");
       s.append(emfTranslator.genAssociationCreationSection());
       s.append("\n");
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      System.out.println(e.getMessage());
-    }
+   
     return s.toString();
   }
   

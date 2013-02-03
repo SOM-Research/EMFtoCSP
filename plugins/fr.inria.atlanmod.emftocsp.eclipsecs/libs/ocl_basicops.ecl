@@ -441,6 +441,7 @@ ocl_real_less_equal(Instances, Vars, Pred1, Pred2, Result) :-
 ocl_string_concat(Instances, Vars, Pred1, Pred2, Result) :-
 	apply(Pred1, [Instances, Vars, X]),
 	apply(Pred2, [Instances, Vars, Y]),
+        str_len(Result,_),
 	str_concat(X,Y,Result).
 
 ocl_string_size(Instances, Vars, Pred, Result) :-
@@ -453,18 +454,18 @@ ocl_string_not_equals(Instances, Vars, Pred1, Pred2, Result) :-
 	apply(Pred1, [Instances, Vars, X]),
 	apply(Pred2, [Instances, Vars, Y]),
 	Result #= 1 - Z,
-	ocl_str_eq(X,Y,Z).
+	str_eq(X,Y,Z).
 
 ocl_string_equals(Instances, Vars, Pred1, Pred2, Result) :-
 	Result :: 0..1,
 	apply(Pred1, [Instances, Vars, X]),
 	apply(Pred2, [Instances, Vars, Y]),
-	ocl_str_eq(X,Y,Result).
+	str_eq(X,Y,Result).
 
-delay ocl_str_eq(S1,S2,1) if nonground(S1),nonground(S2).
-ocl_str_eq(S1,S2,0) :- str_neq(S1,S2).
-ocl_str_eq(S,S,1).
 
+delay ocl_if_then_else(_,_,C,_,_,_) if nonground(C).
+ocl_if_then_else(Instances,Vars,1,ThenPred,_,Result) :- apply(ThenPred,[Instances,Vars,Result]).
+ocl_if_then_else(Instances,Vars,0,_,ElsePred,Result) :- apply(ElsePred,[Instances,Vars,Result]).
 
 
 %------------------------------------------------------------------------------
@@ -546,6 +547,21 @@ aux_baseType(Type, BaseType) :-
      BaseType = Type
    ).
 
+% an intermediate version that ignores the runtime type of the objects
+ocl_obj_equals(ocl_undef, ocl_undef, 1) :- !.
+ocl_obj_equals(_, ocl_undef, 0) :-!.
+ocl_obj_equals(ocl_undef, _, 0) :-!.
+ocl_obj_equals(Obj1, Obj2, Result):-
+   Result::0..1,
+   ocl_mustBeObject(Obj1, Object1),
+   ocl_mustBeObject(Obj2, Object2),
+   % Compute the Oids of both objects
+   getOid(Object1, Oid1),
+   getOid(Object2, Oid2),
+   % Check if both Oids are equal
+   #=( Oid1, Oid2, Result ).  
+
+        
 %ocl_obj_equals(Instances, Obj1, Type1, Obj2, Type2, Result) :-
 %   Result is true if Obj1 and Obj2 are equal
 delay ocl_obj_equals(_, Obj1, _ , Obj2, _, _ ) if (var(Obj1);var(Obj2)).
@@ -655,7 +671,6 @@ delay ocl_navigation(_,_,_,_,X,_) if var(X).
 ocl_navigation(_, _, _, _, ocl_undef, ocl_undef) :- !.
 ocl_navigation(_, _, _, _, [ocl_undef], [ocl_undef]) :- !.
 ocl_navigation(Instances, Association, SrcRole, DstRole, Objects, Result) :-
-
    % Get the list of oids of the source objects
    ( is_list(Objects) -> 
     
@@ -686,7 +701,14 @@ ocl_navigation(Instances, Association, SrcRole, DstRole, Objects, Result) :-
    nth1(ClassIndex, Instances, ObjectsOfType),
 
    % Select only those objects with an oid in the oid list
-   aux_selectByOid(ObjectsOfType, TargetOidList, Result).
+   aux_selectByOid(ObjectsOfType, TargetOidList, Result1),
+   roleMax(Association,DstRole,Max),
+   (Max==1 -> aux_set_to_obj(Result1,Result) ; Result=Result1).
+
+delay aux_set_to_obj(X,_) if var(X).
+aux_set_to_obj([],ocl_undef) :- !.
+aux_set_to_obj([X],X) :- !.
+aux_set_to_obj(_,_) :- fail.
 
 % aux_navigate(LinkList, SrcIndex, DstIndex, OidList, Result) :-
 %    - LinkList is a list of links of an association

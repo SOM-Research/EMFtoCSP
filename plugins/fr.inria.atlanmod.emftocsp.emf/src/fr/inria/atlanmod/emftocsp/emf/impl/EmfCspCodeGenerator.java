@@ -26,6 +26,7 @@ import fr.inria.atlanmod.emftocsp.ICspCodeGenerator;
 import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IOclParser;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
@@ -94,7 +95,7 @@ public abstract class EmfCspCodeGenerator implements ICspCodeGenerator<Resource,
   } 
 
   @Override
-  public abstract String getCspCode();  
+  public abstract String getCspCode() throws ProcessingException;  
 
   @Override
   public abstract String getCspCodeFileExtension();  

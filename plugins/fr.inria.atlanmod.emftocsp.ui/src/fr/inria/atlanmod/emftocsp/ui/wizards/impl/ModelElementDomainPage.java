@@ -183,7 +183,7 @@ public class ModelElementDomainPage extends WizardPage {
         modelElementsDomain.put(c.getPackage().getName() + "." + c.getName(), "0..5"); //$NON-NLS-1$ //$NON-NLS-2$
         List<Property> atList = modelReader.getClassAttributes(c);
         for (Property at : atList) 
-          if (at.getType().getName().equals("Boolean")) //$NON-NLS-1$
+          if (at.getType() != null && "Boolean".equals(at.getType().getName())) //$NON-NLS-1$
             modelElementsDomain.put(at.getClass_().getName() + "." + at.getName(), "0..1"); //$NON-NLS-1$ //$NON-NLS-2$
           else
             modelElementsDomain.put(at.getClass_().getName() + "." + at.getName(), "[1,10,20]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -201,6 +201,8 @@ public class ModelElementDomainPage extends WizardPage {
         for (EAttribute at : atList)
           if (at.getEAttributeType().getInstanceClass().getSimpleName() == "boolean") //$NON-NLS-1$
             modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName(), "0..1"); //$NON-NLS-1$ //$NON-NLS-2$
+          else if (at.getEType().getInstanceClassName().contains("String"))
+            modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName(), "0..10"); //$NON-NLS-1$ //$NON-NLS-2$          
           else
             modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName(), "[1,10,20]"); //$NON-NLS-1$ //$NON-NLS-2$
       }
@@ -279,8 +281,14 @@ public class ModelElementDomainPage extends WizardPage {
             IModelReader modelReader = modelSolver.getModelReader();     
             return modelReader.getAssociationName(((EAssociation)element));
           }
-          if (element instanceof EAttribute)
-            return ((EAttribute)element).getName() + ": " + ((EAttribute)element).getEAttributeType().getInstanceClass().getSimpleName(); //$NON-NLS-1$
+		if (element instanceof EAttribute){
+	          EAttribute a = (EAttribute) element;
+	          //FIXME: need a better way to identify string data types
+	          if (a.getEType() != null && a.getEType().getName().contains("String")) {
+                  return ((EAttribute)element).getName() + ": " + ((EAttribute)element).getEAttributeType().getInstanceClass().getSimpleName() + " (length)"; //$NON-NLS-1$
+	          }
+              return ((EAttribute)element).getName() + ": " + ((EAttribute)element).getEAttributeType().getInstanceClass().getSimpleName(); //$NON-NLS-1$	        	  
+		}
           if (element instanceof Property)
             return ((Property)element).getName() + ": " + ((Property)element).getType().getName(); //$NON-NLS-1$
           return "";         //$NON-NLS-1$

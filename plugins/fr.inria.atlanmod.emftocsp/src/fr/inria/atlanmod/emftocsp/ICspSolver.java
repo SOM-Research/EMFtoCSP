@@ -19,9 +19,9 @@ import java.util.List;
  */
 public interface ICspSolver {
   
-  public boolean solveCSP(File srcFile, List<File> libs) throws Exception;  
+  public boolean solveCSP(File srcFile, List<File> libs) throws ProcessingException;  
 
-  public boolean solveCSP(File srcFile) throws Exception;  
+  public boolean solveCSP(File srcFile) throws ProcessingException;  
   
   public Object getResult();
   

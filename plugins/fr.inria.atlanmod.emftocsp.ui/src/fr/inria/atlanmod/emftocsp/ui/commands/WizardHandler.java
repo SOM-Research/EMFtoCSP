@@ -100,7 +100,11 @@ public class WizardHandler extends AbstractHandler implements IHandler {
     modelSolver.setSolver(solver);
     modelSolver.setCspCodeGenerator(new UmlToEclCodeGenerator(modelSolver));
 
-    ValidationWizard wizard = new ModelSelectedWizard(modelSolver);
+    modelSolver.setLogger(new FileLogger());
+    //  modelSolver.setLogger(new FileLogger(modelFile.getRawLocation().toOSString().concat(".emftocsp.log")));
+    modelSolver.getLogger().writeInfoMessage(this.getClass().toString(), "Starting EMFtoCSP GUI");
+
+  ValidationWizard wizard = new ModelSelectedWizard(modelSolver);
     WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
     dialog.open();
   }

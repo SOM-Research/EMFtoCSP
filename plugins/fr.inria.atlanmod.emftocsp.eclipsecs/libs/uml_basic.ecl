@@ -297,7 +297,7 @@ linksConstraintMultiplicities4(_,N,N,_,OClassB,_,_,LB) :-
 	linksConstraintMultiplicities4Aux(OClassB,N,LB).
 
 linksConstraintMultiplicities4(_,_,_,LA,_,_,_,_) :-
-	printf("ic_global:ordered(=<, %w)",[LA]),nl,
+        % printf("ic_global:ordered(=<, %w)",[LA]),nl,
 	ic_global:ordered(=<, LA).
 
 linksConstraintMultiplicities4Aux(OClassA,N,LA) :-

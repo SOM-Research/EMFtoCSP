@@ -22,14 +22,14 @@ public interface IOclParser<CT, R> {
   
   CT parseOclConstraint(Object context, String key, String constraint);
   
-  List<CT> parseOclDocument(IFile oclDocument, R modelResource) throws Exception;
+  List<CT> parseOclDocument(IFile oclDocument, R modelResource) throws ProcessingException;
   
   List<CT> parseEmbeddedConstraints(R modelResource);
   
-  List<CT> parseModelConstraints(R modelResource, IFile oclDocument) throws Exception;
+  List<CT> parseModelConstraints(R modelResource, IFile oclDocument) throws ProcessingException;
   
-  List<String> getModelConstraintsNames(R modelResource, IFile oclDocument) throws Exception;
+  List<String> getModelConstraintsNames(R modelResource, IFile oclDocument) throws ProcessingException;
 
-  List<String> getModelInvariantNames(R modelResource, IFile oclDocument) throws Exception;
+  List<String> getModelInvariantNames(R modelResource, IFile oclDocument) throws ProcessingException;
   
 }

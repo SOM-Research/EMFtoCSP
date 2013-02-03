@@ -11,6 +11,7 @@
 package fr.inria.atlanmod.emftocsp.uml.impl;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.ocl.OCLInput;
+import org.eclipse.ocl.ParserException;
 import org.eclipse.ocl.helper.OCLHelper;
 import org.eclipse.ocl.uml.OCL;
 import org.eclipse.ocl.uml.UMLEnvironmentFactory;
@@ -30,6 +32,7 @@ import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.resource.UMLResource;
 
 import fr.inria.atlanmod.emftocsp.IOclParser;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
@@ -112,28 +115,37 @@ public class UmlOclParser implements IOclParser<Constraint, UMLResource> {
   }
   
   @Override
-  public List<Constraint> parseOclDocument(IFile oclDocument, UMLResource modelResource) throws Exception {
+  public List<Constraint> parseOclDocument(IFile oclDocument, UMLResource modelResource) throws ProcessingException {
     List<Constraint> constraints = new ArrayList<Constraint>();
     if (oclDocument != null) {
-      InputStream in = new FileInputStream(oclDocument.getRawLocation().toOSString());    
+      InputStream in;
+	try {
+		in = new FileInputStream(oclDocument.getRawLocation().toOSString());
+	} catch (FileNotFoundException e) {
+		throw new ProcessingException(e);
+	}    
       OCLInput document = new OCLInput(in);
       UMLResource resource = modelResource;
       UMLEnvironmentFactory umlEnv = new UMLEnvironmentFactory(resource.getResourceSet());
       OCL oclParser = OCL.newInstance(umlEnv);
-      constraints = oclParser.parse(document);
+      try {
+		constraints = oclParser.parse(document);
+	} catch (ParserException e) {
+		throw new ProcessingException(e);
+	}
     }
     return constraints;
   }
   
   @Override
-  public List<Constraint> parseModelConstraints(UMLResource modelResource, IFile oclDocument) throws Exception {
+  public List<Constraint> parseModelConstraints(UMLResource modelResource, IFile oclDocument) throws ProcessingException {
     List<Constraint> constraints =  parseEmbeddedConstraints(modelResource);
     constraints.addAll(parseOclDocument(oclDocument, modelResource));
     return constraints;
   }  
   
   @Override
-  public List<String> getModelConstraintsNames(UMLResource modelResource, IFile oclDocument) throws Exception {
+  public List<String> getModelConstraintsNames(UMLResource modelResource, IFile oclDocument) throws ProcessingException {
     List<Constraint> constraints = parseModelConstraints(modelResource, oclDocument);
     List<String> cNames = new ArrayList<String>();
     for (Constraint c : constraints) {
@@ -145,7 +157,7 @@ public class UmlOclParser implements IOclParser<Constraint, UMLResource> {
   }
 
   @Override
-  public List<String> getModelInvariantNames(UMLResource modelResource, IFile oclDocument) throws Exception {
+  public List<String> getModelInvariantNames(UMLResource modelResource, IFile oclDocument) throws ProcessingException {
     List<Constraint> constraints = parseModelConstraints(modelResource, oclDocument);
     List<String> cNames = new ArrayList<String>();
     for (Constraint c : constraints) {

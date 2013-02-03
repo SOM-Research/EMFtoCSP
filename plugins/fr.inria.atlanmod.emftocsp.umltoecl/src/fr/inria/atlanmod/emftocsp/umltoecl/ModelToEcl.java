@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.uml2.uml.Association;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Generalization;
@@ -61,9 +63,7 @@ public class ModelToEcl {
   }
 
   protected String genLibsSection() {
-    //How to use the logger
-    //logger.writeInfoMessage(this.getClass().toString(), "Log message");
-    return ":-lib(ic).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).\n";   
+    return ":-lib(ic).\n:-lib(ic_global).\n:-lib(ic_global_gac).\n:-lib(apply).\n:-lib(apply_macros).\n:-lib(lists).\n:-lib(ech).";
   }
   
   protected String genStructSection() {
@@ -272,23 +272,21 @@ public class ModelToEcl {
       s.append("),\n\t");
     }    
     for (String asName : asListNames) {
-      s.append("differentLinks");
-      s.append(asName);
-      s.append("(L");
-      s.append(asName);
-      s.append("),\n\t");
-    }    
-    for (String asName : asListNames) {
-      s.append("orderedLinks");
-      s.append(asName);
-      s.append("(L");
-      s.append(asName);
-      s.append("),\n\t");
-    }       
+        s.append("differentLinks");
+        s.append("(L");
+        s.append(asName);
+        s.append("),\n\t");
+      } 
+      for (String asName : asListNames) {
+        s.append("orderedLinks");
+        s.append("(Instances,\"" + asName + "\"");
+        s.append("),\n\t");
+      }     
+
     return s.toString(); 
   }
   
-  protected String genInstancesSection() {
+  protected String genInstancesSection1() {
     StringBuilder s = new StringBuilder();
 
     s.append("\tInstances = [");
@@ -304,6 +302,11 @@ public class ModelToEcl {
     }   
     s.deleteCharAt(s.length() - 2);
     s.append("],\n\t");
+    return s.toString();
+  }
+ 
+  protected String genInstancesSection2() {
+	    StringBuilder s = new StringBuilder();
     
     for(IModelProperty prop : properties) {
       if (prop instanceof LackOfConstraintsSubsumptionsModelProperty)
@@ -433,7 +436,21 @@ public class ModelToEcl {
         s.append(++i);
         s.append(").\n");
       }
-    }    
+    }
+    for (Class c : cList) {
+        i = 1;
+        List<Property> atList = umlModelReader.getClassAttributes(c);
+        for (Property at : atList) { 
+          s.append("attType(\"");
+          s.append(c.getName());
+          s.append("\",\"");
+          s.append(at.getName());
+          s.append("\",\"");
+          s.append(at.getType().getName());
+          s.append("\").\n");
+          ++i;
+        }
+      }  
     return s.toString();
   }
   

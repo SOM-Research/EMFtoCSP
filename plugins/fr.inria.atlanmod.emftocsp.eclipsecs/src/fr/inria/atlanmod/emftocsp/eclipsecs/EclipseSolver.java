@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 import fr.inria.atlanmod.emftocsp.ICspSolver;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
 
 import com.parctechnologies.eclipse.EclipseEngine;
 import com.parctechnologies.eclipse.EclipseEngineOptions;
@@ -41,12 +42,12 @@ public class EclipseSolver implements ICspSolver {
   }
 
   @Override
-  public boolean solveCSP(File srcFile) throws Exception {
+  public boolean solveCSP(File srcFile) throws ProcessingException {
     return solveCSP(srcFile, null);
   }  
   
   @Override
-  public boolean solveCSP(File srcFile, List<File> libs) throws Exception {
+  public boolean solveCSP(File srcFile, List<File> libs) throws ProcessingException  {
     try {
       createEngineProcess();
       compile(srcFile, libs);
@@ -64,16 +65,18 @@ public class EclipseSolver implements ICspSolver {
     }
     catch (Throw th) {
       disposeEngineProcess(); 
-      //th.printStackTrace();
+      throw new ProcessingException("Unexpected problem. Please consult the executed generated CLP code (.ecl file)",th);
     }
     catch (Fail fail) {
-      disposeEngineProcess();
-    }
-    catch (Exception e) {
-      disposeEngineProcess();
-      throw e;
-    }
-    return false;
+        disposeEngineProcess(); 
+        return false;
+    } catch (EclipseException e) {
+        disposeEngineProcess(); 
+        throw new ProcessingException("Unexpected problem. Please consult the executed generated CLP code (.ecl file)",e);
+	} catch (IOException e) {
+		disposeEngineProcess();
+        throw new ProcessingException("Unexpected problem. Please consult the executed generated CLP code (.ecl file)",e);
+	}
   }
   
   @Override
@@ -92,7 +95,7 @@ public class EclipseSolver implements ICspSolver {
         engine.compile(importFile);    
   }
   
-  private File generateImage(String imgFilePath, File dotFile) throws Exception {
+  private File generateImage(String imgFilePath, File dotFile) throws ProcessingException {
     StringBuilder cmd = new StringBuilder();
     
     if (dotFile == null)
@@ -105,8 +108,15 @@ public class EclipseSolver implements ICspSolver {
     cmd.append(imgFile.getAbsolutePath());
     cmd.append(" "); //$NON-NLS-1$
     cmd.append(dotFile.getAbsolutePath());    
-    Process proc = Runtime.getRuntime().exec(cmd.toString());
-    proc.waitFor();
+    Process proc;
+	try {
+		proc = Runtime.getRuntime().exec(cmd.toString());
+	    proc.waitFor();
+	} catch (IOException e) {
+		throw new ProcessingException(e);
+	} catch (InterruptedException e) {
+		throw new ProcessingException(e);
+	}
     return imgFile;
   }
 

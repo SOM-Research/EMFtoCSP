@@ -77,11 +77,13 @@ public class UmlToEclCodeGenerator extends UmlCspCodeGenerator {
       s.append("\n");
       s.append(umlTranslator.genCardinalityInstantiationSection());
       s.append("\n");
+      s.append(umlTranslator.genInstancesSection1());
+      s.append("\n");
       s.append(umlTranslator.genObjectsCreationSection());
       s.append("\n");
       s.append(umlTranslator.genLinksCreationSection());
       s.append("\n");
-      s.append(umlTranslator.genInstancesSection());
+      s.append(umlTranslator.genInstancesSection2());
       s.append("\n");
       s.append(umlTranslator.genOclRootSection());
       s.append("\n");

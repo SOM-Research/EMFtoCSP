@@ -11,6 +11,7 @@
 package fr.inria.atlanmod.emftocsp.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,8 @@ import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
 import fr.inria.atlanmod.emftocsp.IOclParser;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
@@ -123,25 +126,29 @@ public abstract class ModelToCspSolver<R> implements IModelToCspSolver<R> {
   }
   
   @Override
-  public boolean solveModel() throws Exception {
+  public boolean solveModel() throws ProcessingException {
     return solveModel(null);
   }
   
   @Override
-  public boolean solveModel(List<File> importLibs) throws Exception {
+  public boolean solveModel(List<File> importLibs) throws ProcessingException {
     String cspCodeFileExtension = getCspCodeGenerator().getCspCodeFileExtension();
     String cspCodeFileName = getModelFileName() + "." + cspCodeFileExtension; //$NON-NLS-1$
     IPath cspCodeFilePath = getResultLocation().getRawLocation().append(cspCodeFileName);
     File cspCodeFile = new File(cspCodeFilePath.toOSString());
     String cspCode = getCspCodeGenerator().getCspCode();
-    PrintWriter out = new PrintWriter(cspCodeFile);
-    out.println(cspCode);
-    out.flush();    
-    return solver.solveCSP(cspCodeFile, importLibs);
+    try {
+	    PrintWriter out = new PrintWriter(cspCodeFile);
+	    out.println(cspCode);
+	    out.flush();    
+	    return solver.solveCSP(cspCodeFile, importLibs);
+    } catch (IOException e) {
+    	throw new ProcessingException(e);
+    }
   }   
   
   @Override
-  public Object getSolverEvaluationResult() throws Exception {
+  public Object getSolverEvaluationResult()  {
     return solver.getResult();
   }
   

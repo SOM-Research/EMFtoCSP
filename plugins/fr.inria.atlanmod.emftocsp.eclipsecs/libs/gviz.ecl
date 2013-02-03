@@ -198,6 +198,8 @@ gviz_write_class(Stream, Instances, TypeInstances, TypeName) :-
       gviz_write_object(Stream, Instances, Object, TypeName)
    ).    
 
+
+
 % gviz_write_attributes(+Stream, +Object, +TypeName):-
 %   Write all attributes of a given object within class TypeName.
 
@@ -209,10 +211,25 @@ gviz_write_attributes(Stream, Object, TypeName) :-
       % Ignore the oid field
       true;
       attIndex(TypeName, AttribName, Idx),
+      attType(TypeName, AttribName, AttType),
       % Write another attribute
-      printf(Stream, "- %s = '%w'\\l", [AttribName, AttribValue])
+      gviz_att_value_to_string(AttribValue,AttType,VS),
+      printf(Stream, "- %s = '%w'\\l", [AttribName, VS])
      )
    ).
+
+gviz_att_value_to_string(Value,"EString", VS) :- !, gviz_att_value_to_string(Value,"String",VS).
+
+gviz_att_value_to_string(Value,"String", VS) :-
+        is_list(Value),
+	!,
+	(foreach(V,Value),fromto("",V1,V2,VS) do 
+            ( V :: [38,39,60,62,91,92,93,123,125] -> sprintf(X,"\\%c",[V]); sprintf(X,"%c",V)),
+            append_strings(V1,X,V2)
+        ).
+
+gviz_att_value_to_string(Value,_ , VS) :-
+	sprintf(VS,"%w",Value).
 
 % gviz_type_list(+Instances, +Object, +TypeName, -TypeList, -ObjList) :-
 %   Given an Object of a given TypeName, compute the list of subtypes of TypeName

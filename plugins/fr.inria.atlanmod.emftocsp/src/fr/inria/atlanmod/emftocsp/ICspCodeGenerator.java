@@ -33,7 +33,7 @@ public interface ICspCodeGenerator<R, P, C, AS, AT, OP, CT> {
   
   void setModel(R modelResource);
   
-  String getCspCode();
+  String getCspCode() throws ProcessingException;
   
   String getCspCodeFileExtension();  
 }

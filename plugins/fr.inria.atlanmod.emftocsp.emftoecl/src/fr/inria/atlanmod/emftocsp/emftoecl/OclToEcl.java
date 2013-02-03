@@ -34,8 +34,10 @@ import org.eclipse.ocl.ecore.SendSignalAction;
 import org.eclipse.ocl.expressions.BooleanLiteralExp;
 import org.eclipse.ocl.expressions.CollectionItem;
 import org.eclipse.ocl.expressions.CollectionLiteralExp;
+import org.eclipse.ocl.expressions.IfExp;
 import org.eclipse.ocl.expressions.IntegerLiteralExp;
 import org.eclipse.ocl.expressions.IteratorExp;
+import org.eclipse.ocl.expressions.NullLiteralExp;
 import org.eclipse.ocl.expressions.OperationCallExp;
 import org.eclipse.ocl.expressions.PropertyCallExp;
 import org.eclipse.ocl.expressions.RealLiteralExp;
@@ -128,11 +130,18 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
   public String visitStringLiteralExp(StringLiteralExp<EClassifier> literalExp) {
     ++counter;
     String predName = "nConstant" + counter + constraintName;
+    String symbol = literalExp.getStringSymbol();
     oclTranslation.append(predName);
     oclTranslation.append("(_, _, Result):-");
     oclTranslation.append("\n\t");
-    oclTranslation.append("Result=");
-    oclTranslation.append(literalExp.getStringSymbol());
+    oclTranslation.append("str_len(Result," + symbol.length() + "),\n\t");
+    oclTranslation.append("Result = [");
+    char[] chars = symbol.toCharArray();
+    for (int i = 0; i < symbol.length();++i) {
+    	if (i > 0) oclTranslation.append(",");
+    	oclTranslation.append(Character.codePointAt(chars, i));
+    }
+    oclTranslation.append("]");
     oclTranslation.append(".\n");
     return predName;
   }
@@ -280,6 +289,18 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     return processIterators(callExp, it, variableResults);
     
   }
+  
+  @Override
+  public String visitNullLiteralExp(NullLiteralExp<EClassifier> literalExp) {
+    ++counter;
+    String predName = "nConstant" + counter + constraintName;
+    oclTranslation.append(predName);
+    oclTranslation.append("(_, _, Result):-");
+    oclTranslation.append("\n\t");
+    oclTranslation.append("Result=ocl_undef");
+    oclTranslation.append(".\n");
+    return predName;
+  }
    
   private String processIterators(IteratorExp<EClassifier, EParameter> callExp, Iterator<Variable<EClassifier, EParameter>> it, List<String> variableResults) {
 
@@ -414,8 +435,6 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       name = "binary_minus";
     else if (name.equals("-") && arguments == 0)
       name = "unary_minus";
-    else if (name.equals("concat"))
-        name = "concat";
     else if (name.equals("union")) {
     	if (callExp.getArgument().get(0).getType().getName().startsWith("Bag")) { 
     		name = "unionBag";
@@ -424,8 +443,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     	}
     } else if (name.equals("=")) {
     	return "equals";
-    } else if (name.equals("size") && callExp.getSource().getType().getName().contains("String")) 
-    	return "string_size";
+    }
     return name;
   }  
   
@@ -444,8 +462,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     if (opCSPName.equals("atPre"))
       return "ZERO_PARAMETERS_AT_PRE";
     if (opCSPName.equals("plus") || opCSPName.equals("times") || opCSPName.equals("division") || opCSPName.equals("div") ||
-        opCSPName.equals("mod") || opCSPName.equals("min") || opCSPName.equals("max") || opCSPName.equals("binary_minus") ||
-        opCSPName.equals("concat"))
+        opCSPName.equals("mod") || opCSPName.equals("min") || opCSPName.equals("max") || opCSPName.equals("binary_minus"))
       return trans2ParamsArithRelOp(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("abs") || opCSPName.equals("floor") || opCSPName.equals("round") || opCSPName.equals("unary_minus"))
       return trans1ParamArithOp(callExp, sourceResult, argumentResults);
@@ -456,7 +473,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       String t = callExp.getSource().getType().getName();
       if (t.equals("Boolean") || t.equals("Integer") || t.equals("String") || t.equals("Real") || t.equals("Date"))
     	return trans2ParamsArithRelOp(callExp, sourceResult, argumentResults);
-      else if (t.startsWith("Bag") || t.startsWith("Set") || t.startsWith("Sequence")) {
+      else if (isCollectionType(callExp.getSource().getType())) {
     	  return trans1ParamOverCollections(callExp, sourceResult, argumentResults);
       } else {
     	  return trans2ParamsEqOverObjects(callExp, sourceResult, argumentResults);
@@ -467,11 +484,13 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     if (opCSPName.equals("not"))
       return trans1ParamLogicOp(callExp, sourceResult, argumentResults);
      
-    if (callExp.getSource().getType().getName().contains("String") && opCSPName.equals("string_size")) {
-        return trans1ParamArithOp(callExp, sourceResult, argumentResults);
+    if (callExp.getSource().getType().getName().contains("String")) {
+        return transOpOverStrings(callExp, sourceResult, argumentResults);
     }
+
     if (opCSPName.equals("size") || opCSPName.equals("isEmpty") || opCSPName.equals("notEmpty") || opCSPName.equals("sum") ||
-        opCSPName.equals("flatten") || opCSPName.equals("asSet") || opCSPName.equals("asOrderedSet") || opCSPName.equals("asSequence") ||
+        opCSPName.equals("flatten") || (opCSPName.equals("asSet") && isCollectionType(callExp.getSource().getType())) || 
+        opCSPName.equals("asOrderedSet") || opCSPName.equals("asSequence") ||
         opCSPName.equals("asBag") || opCSPName.equals("first") || opCSPName.equals("last"))
       return transNoParamsOverCollections(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("excludes") || opCSPName.equals("includes") || opCSPName.equals("excludesAll") || opCSPName.equals("includesAll") ||
@@ -481,53 +500,84 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       return trans1ParamOverCollections(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("insertAt") || opCSPName.equals("subSequence") || opCSPName.equals("subOrderedSet"))
       return trans2ParamsOverCollections(callExp, sourceResult, argumentResults);
-    if (opCSPName.equals("toInteger") || opCSPName.equals("toReal"))
-      return transNoParamsOverStrings(callExp, sourceResult, argumentResults);
-    if (opCSPName.equals("concat"))
-      return trans1ParamOverStrings(callExp, sourceResult, argumentResults);
-    if (opCSPName.equals("substring"))
-      return trans2ParamsOverStrings(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("oclIsUndefined"))
       return transOclIsUndefined(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("oclIsKindOf") || opCSPName.equals("oclIsTypeOf") || opCSPName.equals("oclAsType"))
       return trans1ParamWithType(callExp, sourceResult, argumentResults);
     if (opCSPName.equals("oclIsNew"))
       return transOclIsNew(callExp, sourceResult, argumentResults);
+    if (opCSPName.equals("oclAsSet"))
+        return transOclAsSet(callExp, sourceResult, argumentResults);
     System.err.println("Unhandled opcall: " + callExp);
     return "";    
   }
 
-  /***
-   * TO DO
-   * @param callExp
-   * @param sourceResult
-   * @param argumentResults
-   * @return
-   */
-  private String transNoParamsOverStrings(OperationCallExp<EClassifier, EOperation> callExp, String sourceResult, List<String> argumentResults) {
-    return "";
+  protected String handleIfExp(IfExp<EClassifier> ifExp, String conditionResult, String thenResult, String elseResult) {
+		++counter;
+		String predName = "nIfExp" + counter + constraintName;
+		oclTranslation.append(predName);
+		oclTranslation.append("(Instances, Vars, Result):-\n\t");
+		oclTranslation.append(conditionResult + "(Instances, Vars, Value1),\n\t");
+		oclTranslation.append("ocl_if_then_else(Instances,Vars,Value1," + thenResult + "," + elseResult + ",Result).\n");
+		return predName;
+  }
+ 
+
+  private String transOclAsSet(OperationCallExp<EClassifier, EOperation> callExp,
+		String sourceResult, List<String> argumentResults) {
+	  
+	  String opCSPName = "ocl_obj_asSet";
+
+	++counter;
+	String predName = "n" + opCSPName + counter + constraintName;
+	oclTranslation.append(predName);
+	oclTranslation.append("(Instances, Vars, Result):-");    
+	oclTranslation.append("\n\t");
+	oclTranslation.append(sourceResult);
+	oclTranslation.append("(Instances, Vars, Value1),");
+	oclTranslation.append("\n\t");
+	oclTranslation.append("ocl_obj_asSet(Value1, Result).\n");
+	return predName;
+}
+
+private boolean isCollectionType(EClassifier type) {
+	String t = type.getName();  
+	System.err.println("T=" + t);
+	return t.startsWith("Bag") || t.startsWith("Set") || t.startsWith("Sequence");
   }
 
-  /***
+/***
    * TO DO
    * @param callExp
    * @param sourceResult
    * @param argumentResults
    * @return
    */
-  private String trans1ParamOverStrings(OperationCallExp<EClassifier, EOperation> callExp, String sourceResult, List<String> argumentResults) {
-    return "";
-  }
+  private String transOpOverStrings(OperationCallExp<EClassifier, EOperation> callExp, String sourceResult, List<String> argumentResults) {
+	  EOperation op = callExp.getReferredOperation();
+	  String opName = getName(op);
+	  String opType = callExp.getType().getName();
+	  int params = -1;
+	  if (op.getEParameters() != null)
+		  params = op.getEParameters().size();
+	  
+	  if (opName.equals("+")) opName = "concat";
 
-  /***
-   * TO DO
-   * @param callExp
-   * @param sourceResult
-   * @param argumentResults
-   * @return
-   */
-  private String trans2ParamsOverStrings(OperationCallExp<EClassifier, EOperation> callExp, String sourceResult, List<String> argumentResults) {
-    return "";
+	  ++counter;
+	  String predName = "n" + opName + counter + constraintName;
+	  oclTranslation.append(predName);
+	  oclTranslation.append("(Instances, Vars, Result):-");    
+	  oclTranslation.append("\n\t");
+	  oclTranslation.append("ocl_string_");
+	  oclTranslation.append(opName);
+	  oclTranslation.append("(Instances, Vars, ");
+	  oclTranslation.append(sourceResult);
+	  for (int i = 0; i < argumentResults.size(); ++i) {
+		  oclTranslation.append(",");
+		  oclTranslation.append(argumentResults.get(i));
+	  }
+	  oclTranslation.append(", Result).\n");
+	  return predName;
   }
 
   /***
