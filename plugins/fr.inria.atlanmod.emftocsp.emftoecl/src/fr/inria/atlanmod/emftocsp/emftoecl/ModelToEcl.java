@@ -83,9 +83,9 @@ public class ModelToEcl {
       s.append(":- local struct(");
       s.append(emfModelReader.getAssociationName(as).toLowerCase());
       s.append("(");
-      s.append(as.getSourceRoleName());
+      s.append(as.getSourceRoleName().toLowerCase());
       s.append(",");
-      s.append(as.getDestinationRoleName());
+      s.append(as.getDestinationRoleName().toLowerCase());
       s.append(")).\n");              
     }
     return s.toString();
@@ -514,12 +514,12 @@ protected String genCardinalityInstantiationSection() {
       s.append("roleIndex(\"");
       s.append(asName);
       s.append("\",\"");
-      s.append(as.getSourceRoleName());
+      s.append(as.getSourceRoleName().toLowerCase());
       s.append("\",1).\n");
       s.append("roleIndex(\"");
       s.append(asName);
       s.append("\",\"");
-      s.append(as.getDestinationRoleName());
+      s.append(as.getDestinationRoleName().toLowerCase());
       s.append("\",2).\n");
     }     
 
@@ -528,14 +528,14 @@ protected String genCardinalityInstantiationSection() {
       s.append("roleType(\"");
       s.append(asName);
       s.append("\",\"");
-      s.append(as.getSourceRoleName());
+      s.append(as.getSourceRoleName().toLowerCase());
       s.append("\",\"");
       s.append(as.getSourceEnd().getName());
       s.append("\").\n");
       s.append("roleType(\"");
       s.append(asName);
       s.append("\",\"");
-      s.append(as.getDestinationRoleName());
+      s.append(as.getDestinationRoleName().toLowerCase());
       s.append("\",\"");
       s.append(as.getDestinationEnd().getEType().getName());
       s.append("\").\n");
@@ -545,14 +545,14 @@ protected String genCardinalityInstantiationSection() {
       s.append("roleMin(\"");
       s.append(asName);
       s.append("\",\"");
-      s.append(as.getSourceRoleName());
+      s.append(as.getSourceRoleName().toLowerCase());
       s.append("\",");
       s.append(as.getSourceLowerBound());
       s.append(").\n");
       s.append("roleMin(\"");
       s.append(asName);
       s.append("\",\"");
-      s.append(as.getDestinationRoleName());
+      s.append(as.getDestinationRoleName().toLowerCase());
       s.append("\",");
       s.append(as.getDestinationLowerBound());
       s.append(").\n");
@@ -562,14 +562,14 @@ protected String genCardinalityInstantiationSection() {
       s.append("roleMax(\"");
       s.append(asName.toLowerCase());
       s.append("\",\"");
-      s.append(as.getSourceRoleName());
+      s.append(as.getSourceRoleName().toLowerCase());
       s.append("\",");
       s.append(as.getSourceUpperBound() == -1 ? "\"*\"" : as.getSourceUpperBound());
       s.append(").\n");
       s.append("roleMax(\"");
       s.append(asName.toLowerCase());
       s.append("\",\"");
-      s.append(as.getDestinationRoleName());
+      s.append(as.getDestinationRoleName().toLowerCase());
       s.append("\",");
       s.append(as.getDestinationUpperBound() == -1 ? "\"*\"" : as.getDestinationUpperBound());
       s.append(").\n");
@@ -654,9 +654,9 @@ protected String genCardinalityInstantiationSection() {
       s.append("\"");
       
       s.append(", \"");
-      s.append(as.getSourceRoleName());
+      s.append(as.getSourceRoleName().toLowerCase());
       s.append("\", \"");
-      s.append(as.getDestinationRoleName());
+      s.append(as.getDestinationRoleName().toLowerCase());
       s.append("\", CardVariables).\n");
     }    
     return s.toString();
@@ -798,9 +798,9 @@ protected String genCardinalityInstantiationSection() {
       s.append(") do\n\t\tXi=");
       s.append(as.getName().toLowerCase());
       s.append("{");
-      s.append(as.getSourceRoleName());
+      s.append(as.getSourceRoleName().toLowerCase());
       s.append(":ValuePart1,");
-      s.append(as.getDestinationRoleName());
+      s.append(as.getDestinationRoleName().toLowerCase());
       s.append(":ValuePart2}");
       s.append(", ValuePart1#>0, ValuePart1#=<S");
       s.append(as.getSourceEnd().getName());
@@ -815,9 +815,9 @@ protected String genCardinalityInstantiationSection() {
       s.append("(Instances):-\n\tlinksConstraintMultiplicities(Instances, \"");
       s.append(as.getName().toLowerCase());
       s.append("\",\"");
-      s.append(as.getSourceRoleName());
+      s.append(as.getSourceRoleName().toLowerCase());
       s.append("\",\"");
-      s.append(as.getDestinationRoleName());
+      s.append(as.getDestinationRoleName().toLowerCase());
       s.append("\").\n");
     }
     return s.toString();

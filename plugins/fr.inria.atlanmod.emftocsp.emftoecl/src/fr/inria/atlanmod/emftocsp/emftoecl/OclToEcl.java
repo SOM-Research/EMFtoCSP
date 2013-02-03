@@ -263,11 +263,11 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
       oclTranslation.append('"');
       oclTranslation.append(",");
       oclTranslation.append('"');
-      oclTranslation.append(srcRoleName);
+      oclTranslation.append(srcRoleName.toLowerCase());
       oclTranslation.append('"');
       oclTranslation.append(",");
       oclTranslation.append('"');
-      oclTranslation.append(dstRoleName);
+      oclTranslation.append(dstRoleName.toLowerCase());
       oclTranslation.append('"');
       oclTranslation.append(", Value1, Result).\n");            
     }

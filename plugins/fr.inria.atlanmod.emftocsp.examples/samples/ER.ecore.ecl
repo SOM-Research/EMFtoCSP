@@ -1,9 +1,10 @@
 :-lib(ic).
-lib(ic_global).
-lib(ic_global_gac).
+:-lib(ic_global).
+:-lib(ic_global_gac).
 :-lib(apply).
 :-lib(apply_macros).
 :-lib(lists).
+:-lib(ech).
 :- local struct(schema(oid)).
 :- local struct(entity(oid,name)).
 :- local struct(relship(oid,name)).
@@ -28,8 +29,7 @@ findSolutions(Instances):-
 	SRelship #= Srelships_schema,
 	SRelshipEnd #= Sends_relship,
 	SAttribute #= Sattrs_entity,
-
-	liveliness(CardVariables, "Schema"),
+strongSatisfiability(CardVariables),
 	
 	constraintsentities_schemaCard(CardVariables),
 	constraintsrelships_schemaCard(CardVariables),
@@ -43,11 +43,11 @@ findSolutions(Instances):-
 	Instances = [OSchema, OEntity, ORelship, ORelshipEnd, OAttribute, Lentities_schema, Lrelships_schema, Lends_type, Lattrs_entity, Lends_relship ],
 	
 	%Object creation
-	creationSchema(OSchema, SSchema, SSchema, AtSchema, StrSchema),
-	creationEntity(OEntity, SEntity, SEntity, AtEntity, StrEntity),
-	creationRelship(ORelship, SRelship, SRelship, AtRelship, StrRelship),
-	creationRelshipEnd(ORelshipEnd, SRelshipEnd, SRelshipEnd, AtRelshipEnd, StrRelshipEnd),
-	creationAttribute(OAttribute, SAttribute, SAttribute, AtAttribute, StrAttribute),
+	creationSchema(OSchema, SSchema, SSchema, AtSchema),
+	creationEntity(OEntity, SEntity, SEntity, AtEntity),
+	creationRelship(ORelship, SRelship, SRelship, AtRelship),
+	creationRelshipEnd(ORelshipEnd, SRelshipEnd, SRelshipEnd, AtRelshipEnd),
+	creationAttribute(OAttribute, SAttribute, SAttribute, AtAttribute),
 	
 	
 	differentOids(OSchema),
@@ -89,16 +89,14 @@ eRN(Instances),
 	rN(Instances),
 	eN(Instances),
 	eAN(Instances),
+	kEY(Instances),
 	rEN(Instances),
 	
 	AllAttributes = [Pentities_schema, Prelships_schema, Pends_type, Pattrs_entity, Pends_relship, AtSchema, AtEntity, AtRelship, AtRelshipEnd, AtAttribute ],
 	flatten(AllAttributes, Attributes),
 	labeling(Attributes),
-
-	AllCharacters = [StrSchema, StrEntity, StrRelship, StrRelshipEnd, StrAttribute ],
-	flatten(AllCharacters, Characters),
-	labeling(Characters).
-
+	
+str_labeling.
 
 index("Schema",1).
 index("Entity",2).
@@ -115,6 +113,11 @@ attIndex("Relship","name",2).
 attIndex("RelshipEnd","name",2).
 attIndex("Attribute","name",2).
 attIndex("Attribute","isKey",3).
+attType("Entity","name","EBigInteger").
+attType("Relship","name","EBigInteger").
+attType("RelshipEnd","name","EBigInteger").
+attType("Attribute","name","EBigInteger").
+attType("Attribute","isKey","EBoolean").
 
 roleIndex("entities_schema","schema",1).
 roleIndex("entities_schema","entities",2).
@@ -143,7 +146,7 @@ roleMin("relships_schema","relships",0).
 roleMin("ends_type","type",1).
 roleMin("ends_type","ends",0).
 roleMin("attrs_entity","entity",1).
-roleMin("attrs_entity","attrs",0).
+roleMin("attrs_entity","attrs",1).
 roleMin("ends_relship","relship",1).
 roleMin("ends_relship","ends",2).
 roleMax("entities_schema","schema",1).
@@ -164,7 +167,7 @@ assocIsUnique("attrs_entity", 1).
 assocIsUnique("ends_relship", 1).
 
 
-liveliness(CardVariables, "Schema"):- livelinessConstraint(CardVariables, "Schema").
+strongSatisfiability(CardVariables):- strongSatisfiabilityConstraint(CardVariables).
 
 constraintsentities_schemaCard(CardVariables):-constraintsBinAssocMultiplicities("entities_schema", "schema", "entities", CardVariables).
 constraintsrelships_schemaCard(CardVariables):-constraintsBinAssocMultiplicities("relships_schema", "schema", "relships", CardVariables).
@@ -172,40 +175,35 @@ constraintsends_typeCard(CardVariables):-constraintsBinAssocMultiplicities("ends
 constraintsattrs_entityCard(CardVariables):-constraintsBinAssocMultiplicities("attrs_entity", "entity", "attrs", CardVariables).
 constraintsends_relshipCard(CardVariables):-constraintsBinAssocMultiplicities("ends_relship", "relship", "ends", CardVariables).
 
-creationSchema(Instances, Size, _, Attributes, Strings):-
+creationSchema(Instances, Size, _, Attributes):-
 	length(Instances, Size),
-	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), fromto([],StrIn,StrOut,Strings), for(N, 1, Size) do
-		Xi=schema{oid:N}, append([N],AtIn, AtOut),
-		append([],StrIn, StrOut)).
+	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), for(N, 1, Size) do
+		Xi=schema{oid:N}, append([N],AtIn, AtOut)).
 
-creationEntity(Instances, Size, _, Attributes, Strings):-
+creationEntity(Instances, Size, _, Attributes):-
 	length(Instances, Size),
-	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), fromto([],StrIn,StrOut,Strings), for(N, 1, Size) do
+	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), for(N, 1, Size) do
 		Xi=entity{oid:N,name:Int2}, Int2#::[1,10,20],
-		 append([N,Int2],AtIn, AtOut),
-		append([],StrIn, StrOut)).
+		 append([N,Int2],AtIn, AtOut)).
 
-creationRelship(Instances, Size, _, Attributes, Strings):-
+creationRelship(Instances, Size, _, Attributes):-
 	length(Instances, Size),
-	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), fromto([],StrIn,StrOut,Strings), for(N, 1, Size) do
+	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), for(N, 1, Size) do
 		Xi=relship{oid:N,name:Int2}, Int2#::[1,10,20],
-		 append([N,Int2],AtIn, AtOut),
-		append([],StrIn, StrOut)).
+		 append([N,Int2],AtIn, AtOut)).
 
-creationRelshipEnd(Instances, Size, _, Attributes, Strings):-
+creationRelshipEnd(Instances, Size, _, Attributes):-
 	length(Instances, Size),
-	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), fromto([],StrIn,StrOut,Strings), for(N, 1, Size) do
+	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), for(N, 1, Size) do
 		Xi=relshipend{oid:N,name:Int2}, Int2#::[1,10,20],
-		 append([N,Int2],AtIn, AtOut),
-		append([],StrIn, StrOut)).
+		 append([N,Int2],AtIn, AtOut)).
 
-creationAttribute(Instances, Size, _, Attributes, Strings):-
+creationAttribute(Instances, Size, _, Attributes):-
 	length(Instances, Size),
-	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), fromto([],StrIn,StrOut,Strings), for(N, 1, Size) do
+	(foreach(Xi, Instances), fromto([],AtIn,AtOut,Attributes), for(N, 1, Size) do
 		Xi=attribute{oid:N,name:Int2,isKey:Int3}, Int2#::[1,10,20],
 		 Int3#::0..1,
-		 append([N,Int2,Int3],AtIn, AtOut),
-		append([],StrIn, StrOut)).
+		 append([N,Int2,Int3],AtIn, AtOut)).
 
 
 creationentities_schema(Instances, Size, Participants, SSchema, SEntity):-
@@ -446,6 +444,35 @@ nforAll17EAN(Instances, Vars, Result):-
 	ocl_col_forAll(Instances, Vars, Value1, nforAll16EAN, Result).
 eAN(Instances):-
 	nforAll17EAN(Instances, [], Result),
+	Result #=1.
+
+% OCL constraint ER::Entity.allInstances()->forAll(self : Entity | self.attrs->exists(a : Attribute | a.isKey.=(true)))
+nallInstances1KEY(Instances, _, Result):-
+	ocl_allInstances(Instances, "Entity", Result).
+% Lookup for variable self
+nVariable2KEY(_, Vars, Result):-
+	ocl_variable(Vars,1,Result).
+nNavigation3KEY(Instances, Vars, Result):-
+	nVariable2KEY(Instances, Vars, Value1),
+	ocl_navigation(Instances,"attrs_entity","entity","attrs", Value1, Result).
+% Lookup for variable a
+nVariable4KEY(_, Vars, Result):-
+	ocl_variable(Vars,1,Result).
+nAttribute5KEY(Instances, Vars, Result):-
+	nVariable4KEY(Instances, Vars, Object),
+	ocl_attributeCall(Instances,"Attribute","isKey", Object, Result).
+nConstant6KEY(_, _, Result):-
+	Result=1.
+nequals7KEY(Instances, Vars, Result):-
+	ocl_boolean_equals(Instances, Vars, nAttribute5KEY, nConstant6KEY, Result).
+nexists8KEY(Instances, Vars, Result):-
+	nNavigation3KEY(Instances, Vars, Value1),
+	ocl_col_exists(Instances, Vars, Value1, nequals7KEY, Result).
+nforAll9KEY(Instances, Vars, Result):-
+	nallInstances1KEY(Instances, Vars, Value1),
+	ocl_col_forAll(Instances, Vars, Value1, nexists8KEY, Result).
+kEY(Instances):-
+	nforAll9KEY(Instances, [], Result),
 	Result #=1.
 
 % OCL constraint ER::Relship.allInstances()->forAll(self : Relship | self.ends->forAll(e1 : RelshipEnd, e2 : RelshipEnd | e1.name.=(e2.name).implies(e1.=(e2))))
