@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="fr.inria.atlanmod.emftocsp.update" default="compress" basedir=".">
+
+<!-- ******************************************************************************
+	 * Copyright (c) 2010, 2011, 2012, 2013 INRIA Rennes Bretagne-Atlantique and others.
+	 *
+	 * All rights reserved.   This program and the accompanying materials
+	 * are made available under the terms of the Eclipse Public License v1.0
+	 * which accompanies this distribution, and is available at
+	 * http://www.eclipse.org/legal/epl-v10.html
+	 *
+	 * Contributors:
+	 *   INRIA Rennes Bretagne-Atlantique - Initial API and implementation
+	 ******************************************************************************
+-->
+	
+	<!-- generate the zip file containing EMFtoCSP update site -->
+	<target name="compress" >
+		<delete file ="zip/fr.inria.atlanmod.emftocsp.update.zip"/>
+		<mkdir dir="temp"/>
+		<copy todir="temp"
+				failonerror="true" overwrite="true">
+			<fileset dir=".">
+			    <include name="**"/>
+				<exclude name=".svn/**"/>
+				<exclude name="zip/**"/>
+				<exclude name=".project"/>
+			</fileset>
+		</copy>
+		<zip destfile="zip/fr.inria.atlanmod.emftocsp.update.zip"
+			basedir="temp" includes="**" filesonly="false" whenempty="skip" update="false"/>
+		<delete dir="temp"/>
+	</target>
+
+</project>

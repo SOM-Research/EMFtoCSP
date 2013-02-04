@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/fr.inria.atlanmod.emftocsp.examples.feature_1.0.0.201302040915.jar" id="fr.inria.atlanmod.emftocsp.examples.feature" version="1.0.0.201302040915">
+      <category name="samples"/>
+   </feature>
+   <feature url="features/fr.inria.atlanmod.emftocsp.tool.feature_1.0.0.201302040915.jar" id="fr.inria.atlanmod.emftocsp.tool.feature" version="1.0.0.201302040915">
+      <category name="tool"/>
+   </feature>
+   <category-def name="tool" label="EMFtoCSP tool"/>
+   <category-def name="samples" label="EMFtoCSP Samples"/>
+</site>
