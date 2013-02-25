@@ -1,3 +1,13 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%              A lightweight string solver                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Author: Fabian Büttner (fabian.buettner@inria.fr)
+% (c) 2012,2013
+% See "Lightweight String Reasoning in Model Finding", to appear in Sosym
+
+
+:- lib(ic).
 :- lib(ech).
 :- lib(ordset).
 :- handler string.
@@ -41,11 +51,10 @@ build_substr_2      ::= str_len(Y,NY) \ str_substrNX(X,I,J,Y,NX) <=> str_substrN
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                    SYMBOLIC INFERENCE RULES                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sym_eq_reflexive     ::= str_eqNXY(X,X,R,NX,NY) <=> R = 1.
+sym_eq_reflexive     ::= str_eqNXY(X,X,R,NX,NY) <=> print("sym_eq_reflexive"),nl,R = 1.
 
 
-%this rule seems to take a long time for ex1 and ex3a. 
-%it is not strictly needed
+%expensive
 %sym_eq_nothird       ::= str_eqNXY(X,Y,R1,NX,NY) \ str_eqNXY(X,Y,R2,NX,NY) <=> R1 #= R2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,7 +71,7 @@ length_empty_eq       ::= str_eqNXY(X,Y,R,NX,NY) ==>  ic:and(NX #= 0, NY #= 0) =
 
 length_eq_length      ::= str_eqNXY(X,Y,R,NX,NY) ==> R #= 1 => NX #= NY.
 
-length_indexof        ::= str_indexofNXY(X,Y,I,NX,NY) ==> I #>= 0, I #>= 1 => I + NY - 1 #=< NX, I #>= 1 => NX #>= NY.
+length_indexof        ::= str_indexofNXY(X,Y,I,NX,NY) ==> I #>= 0, I #>= 1 => I + NY - 1 #=< NX, I #>= 1 => NX #>= NY, I #>= 1 => NX #>= 1.
 
 length_concat         ::= str_concatNXYZ(X,Y,Z,NX,NY,NZ) ==> NZ #= NX + NY, NX #>= 0,  NY #>=0.
 
@@ -137,8 +146,6 @@ domain_concat_inst3 ::= str_concatNXYZ(X,Y,Z,NX,NY,NZ) <=> is_list(Y),is_list(Z)
 % NOTE(concat): we could add a domain inference rule:
 %domain_concat_groundX          ::= str_concat(X,Y,Z), str_domain(Z,D), str_domain( | ground(X) 
 
-
-% MISSING!
 domain_substr_groundXIJ ::= str_substrNXY(X,I,J,Y,NX,NY) <=> is_list(X),ground(I),ground(J) | N is J - I + 1, sublist(X,I,N,Y).
 
 domain_substr_groundXY  ::= str_substrNXY(X,I,J,Y,NX,NY) <=> is_list(X),is_list(Y) | str_unfold_substr(X,I,J,Y).
@@ -161,8 +168,6 @@ alldifferent_outof    ::= str_outof(X, Left, Right) <=> ground(X) | str_exclude_
 %             OLD RULES AND EXPERIMENTAL RULES (REMOVED)               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-%TODO: CHECK ECMFA PAPER => IS THIS RULE NEEDED / INCLUDED? (IT IS
 
 % indexofdomain3       ::= str_indexofNXY(X,Y,I,NX,NY), str_get_domain(X,D) <=> ground(Y),var(I),str_indexof_checkdomain(X,Y,B1,B2)  | print("check"),nl,,B1 #= 0 => I #= 0, B2 #= 1 => I #\= 0.
 
@@ -204,7 +209,6 @@ str_domain_retain_length(D1,L,D2) :-
 str_label_one :-
         chr_get_constraint(str_domain(S,D)),
         !,
-        sprintf(SN,"%w",[S]),
         member(S1,D),
         S=S1.
 
@@ -243,24 +247,6 @@ str_label_lengths(AlphabetRange, Method, Cs) :-
 str_label_lengths(_,_,[]).
 
 
-:- mode str_set_lengths(-,+).
-str_set_lengths(Chars,Method,CharacterRange) :-
-        str_domain_labeling,
-        print("str_labeling done"),nl,
-	str_collect_lengths([],LengthCons),
-	(foreach(str_len(_,N),LengthCons),foreach(N,Lengths) do true),
-        search(Lengths,0,input_order, Method, complete, []),
-        printf("Solution for lengths %w",[Lengths]),nl,
- 	(foreach(str_len(X,N),LengthCons),fromto([],In,Out,Chars),param(CharacterRange) do 
-            length(X,N), 
-            str_restrict_to_chars(X, CharacterRange), 
-            append(In,X,Out)).
-% :-,
-% :- 	call_with_errmsg(str_process_eqs),
-% :- 	call_with_errmsg(str_process_concats),
-% :- 	call_with_errmsg(str_process_substrs),
-% :- 	call_with_errmsg(str_process_indexofs).
-
 call_with_errmsg(Goal) :-
         call(Goal),!.
 
@@ -275,25 +261,6 @@ str_restrict_to_chars(Cs, CharacterRange) :- Cs #:: CharacterRange.
 str_set_lengths_and_label(Method,CharacterRange) :-
 	str_set_lengths(Chars,Method,CharacterRange),
 	str_label_chars(Chars).
-
-% str_set_lengths_and_label_verbose(Method) :-
-% 	ic_stat(on),
-% 	cputime(T1),
-% 	str_set_lengths(Cs,Method,BT1),
-% 	cputime(T2),
-% 	TX is T2 - T1,
-% 	ic_stat_get(SL1),
-% 	printf("CHR in %w secs using %w backtracks with %w",[TX,BT1,SL1]),nl,
-% 	ic_stat(off),
-% 	ic_stat(reset),
-% 	ic_stat(on),
-% 	str_label_chars(Cs,BT2),	
-% 	ic_stat_get(SL2),
-% 	cputime(T3),
-% 	TY is T3 - T2,
-% 	printf("Char labeling in %w secs using %w backtracks with %w",[TY,BT2,SL2]),nl,
-% 	ic_stat(off).
-	
 
 :- mode str_label_chars(+).
 str_label_chars([]) :- !.
@@ -354,26 +321,18 @@ str_unfold_indexof(X,Y,P) :-
 	R2 #:: 0..1,
 	P #>= 0,
 	LengthDiff is NX - NY, 
-        set_var_name(R2,"R2"),
-	(count(Offset,0,LengthDiff),param(Y,X,NY),fromto(0,In1,Out1,R2),foreach(Pos,Positions) do 
-            set_var_name(R1,"R1"),
+	(count(Offset,0,LengthDiff),param(P,Y,X,NY),fromto(0,In1,Out1,R2) do 
+            % R1 : X contains Y at Offset
             (count(I,1,NY),fromto(1,In,Out,R1),param(Y,X,Offset) do
                 J is I + Offset, 
                 listut:nth1(I,Y,Z1),
                 listut:nth1(J,X,Z2),
                 ic:and(In, Z1 #= Z2, Out)
             ),
-            % case 1: R_k = 1 => P_k = k
-            R1 #= 1 => Pos #= Offset + 1,
-            % case 1: R_k = 0 => P_k = MAX
-            R1 #= 0 => Pos #= 10000,
+            ic:and(In1 #= 0, R1 #= 1) #= (P #= Offset + 1),
             ic:or(In1,R1,Out1)
         ),
-        P #= 0 => R2 #= 0,
-        ic:min(Positions,Min),
-        Min #= 10000 => Min1 #= 0,
-        Min #\= 10000 => Min1 #= Min,
-        P #= Min1.
+        (P #= 0) #= (R2 #= 0). 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -401,7 +360,7 @@ sublist(L,I,N,Res) :-
         S is I + N - 1,
         (count(J,I,S),foreach(C,Res),param(L) do listut:nth1(J,L,C)).
 
-% translates a string atom into a sequnce of character numbers
+% translates a string atom into a sequence of character numbers
 str_to_char_list(Str,L) :-
         string_length(Str,N),
         (count(I,1,N),foreach(C,L),param(Str) do string_code(Str,I,C)).

@@ -25,6 +25,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import fr.inria.atlanmod.emftocsp.ILogger;
 import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
 import fr.inria.atlanmod.emftocsp.emf.impl.EAssociation;
 import fr.inria.atlanmod.emftocsp.impl.LackOfConstraintsRedundanciesModelProperty;
 import fr.inria.atlanmod.emftocsp.impl.LackOfConstraintsSubsumptionsModelProperty;
@@ -670,7 +671,7 @@ protected String genCardinalityInstantiationSection() {
     return typeName;    
   }
   
-  protected String genClassCreationSection() {
+  protected String genClassCreationSection() throws ProcessingException {
     StringBuilder s = new StringBuilder();
     
     for (EClass c : cList) {
@@ -727,6 +728,8 @@ protected String genCardinalityInstantiationSection() {
 	    	s.append("#::");        
 	    	s.append(elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName()));
     	  } else {
+    		  String lengthBound = elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName() + ".length");
+    		  String domainBound = elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName() + ".domain");
     		  s.append("str_len(Str");
     		  s.append(i);
     		  s.append(",");
@@ -734,7 +737,13 @@ protected String genCardinalityInstantiationSection() {
     		  s.append("),");
     		  s.append("LenStr" + i);
     		  s.append("#::");
-    		  s.append(elementsDomain.get(at.getEContainingClass().getName() + "." + at.getName()));
+    		  s.append(lengthBound);
+    		  if (domainBound != null && domainBound.length() != 0) {
+    			  if (! domainBound.matches("\\[\".*\"\\]") ) {
+    				  throw new ProcessingException("String domain must be of the form [\"str1\",\"str2\",...]");
+    			  }
+    			  s.append(",str_constrain_str_domain(Str" + i + "," + domainBound + ")");
+    		  }
     	  }
     	  s.append(",\n\t\t ");
       }

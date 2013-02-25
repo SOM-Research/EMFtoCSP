@@ -58,7 +58,28 @@ import fr.inria.atlanmod.emftocsp.ui.messages.Messages;
  *
  */
 public class ModelElementDomainPage extends WizardPage {
-
+	static class StringAttributeContainer {
+		public enum Kind { LENGTH, DOMAIN };
+		public EAttribute attribute;
+		public Kind kind;
+		public StringAttributeContainer(EAttribute a, Kind k) {
+			attribute = a;
+			kind = k;
+		}
+		
+		public String getKey() { 
+			String base = attribute.getEContainingClass().getName() + "." + attribute.getName();
+			if (kind == Kind.LENGTH) {
+				return base + ".length";
+			}
+			if (kind == Kind.DOMAIN) {
+				return base + ".domain";
+			}
+			throw new RuntimeException();
+		}
+	}
+	
+	
   private final static int CLASS = 1;
   private final static int ASSOCIATION = 2;
   private TreeViewer treeViewer;
@@ -128,9 +149,23 @@ public class ModelElementDomainPage extends WizardPage {
         return structuralNodes.toArray();
       if (parentElement instanceof StructuralNode)
         return ((StructuralNode)parentElement).getChildren();
-      if (parentElement instanceof Class || parentElement instanceof EClass) {
+      if (parentElement instanceof Class) {
         IModelReader modelReader = modelSolver.getModelReader();     
         return modelReader.getClassAttributes(parentElement).toArray();
+      }
+      if (parentElement instanceof EClass) {
+          EClass c = (EClass) parentElement;
+    	  IModelReader modelReader = modelSolver.getModelReader();     
+    	  List<Object> res = new ArrayList<Object>();
+    	  for (EAttribute a : c.getEAttributes()) {
+    		  if (a.getEType().getName().endsWith("String")) {
+    			  res.add(new StringAttributeContainer(a, StringAttributeContainer.Kind.LENGTH));
+    			  res.add(new StringAttributeContainer(a, StringAttributeContainer.Kind.DOMAIN));
+    		  } else {
+    			  res.add(a);
+    		  }
+    	  }
+    	  return res.toArray();
       }
       return null;
     }
@@ -201,8 +236,10 @@ public class ModelElementDomainPage extends WizardPage {
         for (EAttribute at : atList)
           if (at.getEAttributeType().getInstanceClass().getSimpleName() == "boolean") //$NON-NLS-1$
             modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName(), "0..1"); //$NON-NLS-1$ //$NON-NLS-2$
-          else if (at.getEType().getInstanceClassName().contains("String"))
-            modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName(), "0..10"); //$NON-NLS-1$ //$NON-NLS-2$          
+          else if (at.getEType().getInstanceClassName().endsWith("String")) {
+        	  modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName() + ".length", "0..10"); //$NON-NLS-1$ //$NON-NLS-2$
+        	  modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName() + ".domain", ""); //$NON-NLS-1$ //$NON-NLS-2$
+          }
           else
             modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName(), "[1,10,20]"); //$NON-NLS-1$ //$NON-NLS-2$
       }
@@ -283,11 +320,17 @@ public class ModelElementDomainPage extends WizardPage {
           }
 		if (element instanceof EAttribute){
 	          EAttribute a = (EAttribute) element;
-	          //FIXME: need a better way to identify string data types
-	          if (a.getEType() != null && a.getEType().getName().contains("String")) {
-                  return ((EAttribute)element).getName() + ": " + ((EAttribute)element).getEAttributeType().getInstanceClass().getSimpleName() + " (length)"; //$NON-NLS-1$
-	          }
               return ((EAttribute)element).getName() + ": " + ((EAttribute)element).getEAttributeType().getInstanceClass().getSimpleName(); //$NON-NLS-1$	        	  
+		}
+		if (element instanceof StringAttributeContainer){
+			StringAttributeContainer c = (StringAttributeContainer) element;
+            String base = c.attribute.getName() + ": " + c.attribute.getEType().getInstanceClass().getSimpleName(); //$NON-NLS-1$
+            if (c.kind == StringAttributeContainer.Kind.LENGTH) {
+            	return base + " (length)";
+            }
+            if (c.kind == StringAttributeContainer.Kind.DOMAIN) {
+            	return base + " (domain)";
+            }
 		}
           if (element instanceof Property)
             return ((Property)element).getName() + ": " + ((Property)element).getType().getName(); //$NON-NLS-1$
@@ -308,6 +351,8 @@ public class ModelElementDomainPage extends WizardPage {
         @SuppressWarnings({ "rawtypes", "unchecked" })        
         public String getText(Object element) {
           String result = ""; //$NON-NLS-1$
+          if (element instanceof StringAttributeContainer)
+              result = modelElementsDomain.get( ((StringAttributeContainer)element).getKey());
           if (element instanceof EAttribute)
             result = modelElementsDomain.get(((EAttribute)element).getEContainingClass().getName() + "." + ((EAttribute)element).getName()); //$NON-NLS-1$
           if (element instanceof EClass)
@@ -344,6 +389,8 @@ public class ModelElementDomainPage extends WizardPage {
           String result = ""; //$NON-NLS-1$
           if (element instanceof EAttribute)
             result = modelElementsDomain.get(((EAttribute)element).getEContainingClass().getName() + "." + ((EAttribute)element).getName()); //$NON-NLS-1$
+          if (element instanceof StringAttributeContainer)
+              result = modelElementsDomain.get( ((StringAttributeContainer)element).getKey());
           if (element instanceof EClass)
             result = modelElementsDomain.get(((EClass)element).getEPackage().getName() + "." + ((EClass)element).getName()); //$NON-NLS-1$
           if (element instanceof Class)
@@ -366,6 +413,8 @@ public class ModelElementDomainPage extends WizardPage {
           String key = ""; //$NON-NLS-1$
           if (element instanceof EAttribute)
             key = ((EAttribute)element).getEContainingClass().getName() + "." + ((EAttribute)element).getName(); //$NON-NLS-1$
+          if (element instanceof StringAttributeContainer)
+              key =  ((StringAttributeContainer)element).getKey();
           if (element instanceof EClass)
             key = ((EClass)element).getEPackage().getName() + "." + ((EClass)element).getName(); //$NON-NLS-1$
           if (element instanceof Class)
