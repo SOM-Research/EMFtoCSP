@@ -27,7 +27,10 @@ public class EAssociation {
     this.srcEnd = srcEnd;
     this.dstEnd = dstEnd;
   }
-  
+  /*
+  *
+  * Getters and setters
+  */
   public String getName() {
     return name;
   }
