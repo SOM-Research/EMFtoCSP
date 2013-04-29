@@ -19,6 +19,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnumLiteral;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
@@ -45,6 +46,10 @@ import org.eclipse.ocl.expressions.StringLiteralExp;
 import org.eclipse.ocl.expressions.TypeExp;
 import org.eclipse.ocl.expressions.Variable;
 import org.eclipse.ocl.expressions.VariableExp;
+import org.eclipse.ocl.types.BagType;
+import org.eclipse.ocl.types.OrderedSetType;
+import org.eclipse.ocl.types.PrimitiveType;
+import org.eclipse.ocl.types.SequenceType;
 import org.eclipse.ocl.types.SetType;
 import org.eclipse.ocl.util.TypeUtil;
 import org.eclipse.ocl.utilities.AbstractVisitor;
@@ -54,6 +59,7 @@ import org.eclipse.ocl.utilities.TypedElement;
 import org.eclipse.ocl.utilities.UMLReflection;
 
 import fr.inria.atlanmod.emftocsp.ILogger;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
@@ -254,7 +260,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
 
       EReference eRef = (EReference)refProp;
       String dstRoleName = eRef.getName();
-      String srcRoleName = eRef.getEOpposite() != null ? eRef.getEOpposite().getName() : "";
+      String srcRoleName = eRef.getEOpposite() != null ? eRef.getEOpposite().getName() : eRef.getEContainingClass().getName().toLowerCase();
       String asName = srcRoleName.compareToIgnoreCase(dstRoleName) < 0 ? srcRoleName + "_" + dstRoleName : dstRoleName + "_" + srcRoleName; //$NON-NLS-1$ //$NON-NLS-2$
       asName = asName.toLowerCase();
       oclTranslation.append("ocl_navigation(Instances,");
@@ -377,22 +383,47 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     return firstPredicate;
   }
 
-  private String getType(TypedElement<EClassifier> exp) {
-    String type = getName(exp.getType());
-    if (type.toLowerCase().contains("int"))
-      return "int";
-    if (type.toLowerCase().contains("bool"))
-      return "boolean";
-    if (type.toLowerCase().contains("real"))
-      return "real";
-    if (type.toLowerCase().contains("set"))
-      return "set";
-    if (type.toLowerCase().contains("bag"))
-      return "bag";
-    if (type.toLowerCase().contains("seq"))
-      return "seq";
-    return type;    
+  
+  private String getType(TypedElement<EClassifier> exp) throws ProcessingException {
+	  EClassifier type = exp.getType();
+	  if (type instanceof OrderedSetType) {
+		  return "ordset";
+	  } else if (type instanceof BagType) {
+		  return "bag";
+	  } else if (type instanceof SequenceType) {
+		  return "seq";
+	  } else if (type instanceof SetType) {
+		  return "set";
+	  } else if (type instanceof PrimitiveType) {
+		  if (((PrimitiveType)type).getName().equals("Integer"))
+		  return "int";
+		  else if(((PrimitiveType)type).getName().equals("Real"))
+			  return "real";
+		  else if(((PrimitiveType)type).getName().equals("Boolean"))
+			  return "bool";
+		  throw new ProcessingException("Unsupported instance class for EDatatype: " +((PrimitiveType)type).getName() );
+					  
+	  } 
+	  return getName(type);
   }
+  
+//  
+//  private String getType(TypedElement<EClassifier> exp) {
+//    String type = getName(exp.getType());
+//    if (type.toLowerCase().contains("int"))
+//      return "int";
+//    if (type.toLowerCase().contains("bool"))
+//      return "boolean";
+//    if (type.toLowerCase().contains("real"))
+//      return "real";
+//    if (type.toLowerCase().contains("set"))
+//      return "set";
+//    if (type.toLowerCase().contains("bag"))
+//      return "bag";
+//    if (type.toLowerCase().contains("seq"))
+//      return "seq";
+//    return type;    
+//  }
 
   private String getType(OperationCallExp<EClassifier, EOperation> exp) {
     EClassifier sourceType = exp.getSource().getType();

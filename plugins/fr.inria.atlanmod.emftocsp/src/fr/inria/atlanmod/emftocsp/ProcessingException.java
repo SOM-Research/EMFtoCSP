@@ -2,7 +2,7 @@ package fr.inria.atlanmod.emftocsp;
 
 
 
-public class ProcessingException extends Exception {
+public class ProcessingException extends RuntimeException {
 
 	/**
 	 * 
