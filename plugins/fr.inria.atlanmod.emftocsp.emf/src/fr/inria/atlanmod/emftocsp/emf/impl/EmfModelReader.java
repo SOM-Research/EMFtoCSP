@@ -43,16 +43,27 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
 
   @Override
   public List<EPackage> getPackages() {
-    ArrayList<EPackage> pList = new ArrayList<EPackage>();
-    if (r.getContents() != null)
-      for (EObject obj : r.getContents()) 
-        if (obj instanceof EPackage) {
-          pList.add((EPackage)obj);
-          EPackage.Registry.INSTANCE.put(((EPackage)obj).getNsURI(), (EPackage)obj);
-        }
-    return pList;
+          ArrayList<EPackage> pList = new ArrayList<EPackage>();
+          if (r.getContents() != null)
+                  for (EObject obj : r.getContents())
+                          if (obj instanceof EPackage) {
+                                  EPackage pack = (EPackage) obj;
+                                  retrieveSubPackages(pack, pList);
+                                  pList.add((EPackage) obj);
+                                  EPackage.Registry.INSTANCE.put(((EPackage) obj).getNsURI(),
+                                                  (EPackage) obj);
+                          }
+          return pList;
   }
 
+  private void retrieveSubPackages(EPackage parentPackage,
+                  List<EPackage> allPackages) {
+          for (EPackage subPackage : parentPackage.getESubpackages()) {
+                  allPackages.add(subPackage);
+                  EPackage.Registry.INSTANCE.put(subPackage.getNsURI(), subPackage);
+                  retrieveSubPackages(subPackage, allPackages);
+          }
+  }
 	private List<EClass> getClassesFromPackage(EPackage p) {
 	  ArrayList<EClass> cList = new ArrayList<EClass>();
 	  if (p.getEClassifiers() != null)
