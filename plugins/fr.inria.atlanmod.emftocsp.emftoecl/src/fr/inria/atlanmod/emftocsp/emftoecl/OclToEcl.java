@@ -751,7 +751,7 @@ private boolean isCollectionType(EClassifier type) {
     } else if (callExp.getSource().getType().getName().startsWith("Set")) {
     	oclTranslation.append("set");
     } else if (callExp.getSource().getType().getName().startsWith("Sequence")) {
-    	oclTranslation.append("sequence");
+    	oclTranslation.append("seq");
     } else {
     	oclTranslation.append(opType.toLowerCase());
     }
