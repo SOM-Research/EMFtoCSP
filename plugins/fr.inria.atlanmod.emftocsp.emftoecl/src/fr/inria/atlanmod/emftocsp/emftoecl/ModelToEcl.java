@@ -99,11 +99,14 @@ public class ModelToEcl {
   protected String genCardinalityDefinitionsSection() {  
     StringBuilder s = new StringBuilder();
     String nameList = "";
+    String nameList2 = "";
     s.append("\t%Cardinality definitions\n\t");
     for (EClass c : cList) {
       s.append("S");
       s.append(c.getName());
       nameList += "S" + c.getName() + ", ";
+      if (!isAbsWithNoChilds(c))
+      nameList2 += "S" + c.getName() + ", ";
       s.append("::");
       s.append(elementsDomain.get(c.getEPackage().getName() + "." + c.getName()));
       s.append(", ");
@@ -117,14 +120,26 @@ public class ModelToEcl {
       s.append("::");
       s.append(elementsDomain.get(asName));
       s.append(", ");
-    }      
+    }  
+    for (String name : emfModelReader.getAssociationNamesOfNonAbsClasses())
+    	nameList2 += "S" + name.toLowerCase() + ", ";
     s.append("\n\t");
     s.append("CardVariables=[");
     s.append(nameList.substring(0, nameList.length() - 2));
     s.append("],\n\t");
+    
+    s.append("\n\t");
+    s.append("CardVariables2=[");
+    s.append(nameList2.substring(0, nameList2.length() - 2));
+    s.append("],\n\t");
     return s.toString();
   }
   
+  
+  private boolean isAbsWithNoChilds(EClass c){
+	  return c.isAbstract() && emfModelReader.getClassSubtypes(cList, c)== null;
+	  
+  }
   protected String genCardinalityConstraintsSection() {  
     StringBuilder s = new StringBuilder();
     s.append("\t%Cardinality constraints\n\t");
@@ -132,6 +147,7 @@ public class ModelToEcl {
     s.append("% cardinality constraints derived from containment tree (compositions)\n");
     for (EClass c : cList) {
     	boolean complete = true;
+//   	List<String> cardVars = getContainments(c);
     	List<String> cardVars = new ArrayList<String>();
 		for (EReference ref : c.getEReferences()) {
 			if (ref.isContainer()) {
@@ -142,12 +158,13 @@ public class ModelToEcl {
 				}
 			}
 		}
+	
 		if (! cardVars.isEmpty() ) {
 			s.append("\tS" + c.getName());
 			if (complete) {
 				s.append(" #= ");
 			} else {
-				s.append(" #=< ");
+				s.append(" #>= ");
 			}
 			for (Iterator<String> itCardVar = cardVars.iterator(); itCardVar.hasNext();) {
 				s.append(itCardVar.next());
@@ -163,7 +180,7 @@ public class ModelToEcl {
 
     for(IModelProperty prop : properties) {
       if (prop instanceof StrongSatisfiabilityModelProperty)
-        s.append("strongSatisfiability(CardVariables),");
+        s.append("strongSatisfiability(CardVariables2),");
       if (prop instanceof WeakSatisfiabilityModelProperty)
         s.append("\n\tweakSatisfiability(CardVariables),");
       if (prop instanceof LivelinessModelProperty) {
@@ -203,7 +220,17 @@ public class ModelToEcl {
     return s.toString();    
   }
   
-  /**
+  private List<String> getContainments(EClass c) {
+	List<String> cardVars= new ArrayList<String>();
+	for (EAssociation as : asList) {
+		if ( as.getDestinationEnd().isContainment() && as.getDestinationEnd().getEReferenceType() == c )
+			cardVars.add("S" + as.getName().toLowerCase());
+	}
+
+	return cardVars;
+}
+
+/**
    * Returns the association that includes this reference.
    */
   private EAssociation getAssociation(EReference ref) {
@@ -262,8 +289,10 @@ protected String genCardinalityInstantiationSection() {
     }
     s.append("\n\t");     
     for (EClass c : cList) {
-      List<EClass> subTypes = emfModelReader.getClassSubtypes(cList, c);
-      if (subTypes != null) 
+    	List<EClass> subTypes = emfModelReader.getClassSubtypes(cList, c);
+      String b= "";
+      if (subTypes!=null) 
+    	
         for(EClass subType : subTypes) { 
           s.append("existingOids");
           s.append(subType.getName());
@@ -274,7 +303,17 @@ protected String genCardinalityInstantiationSection() {
           s.append(", O");
           s.append(c.getName());
           s.append("),\n\t");
+          b+=("O"+subType.getName()+", ");
         }
+      if (c.isAbstract()){
+    	  s.append("existsOidInOneOf(O");
+    	  s.append(c.getName());
+    	  s.append(", [");
+    	  if (b.length() >= 2)
+    	  s.append(b.substring(0, b.length()-2));
+    	  s.append("]),\n\t");
+      }
+    	  
     }    
     for (EClass c : cList) {
       List<EClass> subTypes = emfModelReader.getClassSubtypes(cList, c);
@@ -641,6 +680,7 @@ protected String genCardinalityInstantiationSection() {
         }
       }
     }   
+    
     return s.toString();
   }
   

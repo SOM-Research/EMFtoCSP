@@ -400,7 +400,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
 		  else if(((PrimitiveType)type).getName().equals("Real"))
 			  return "real";
 		  else if(((PrimitiveType)type).getName().equals("Boolean"))
-			  return "bool";
+			  return "boolean";
 		  throw new ProcessingException("Unsupported instance class for EDatatype: " +((PrimitiveType)type).getName() );
 					  
 	  } 
@@ -841,7 +841,8 @@ private boolean isCollectionType(EClassifier type) {
     oclTranslation.append("ocl_");
     oclTranslation.append(opCSPName);
     oclTranslation.append("(Instances, Object, \"");
-    oclTranslation.append(opType.toLowerCase());
+    //oclTranslation.append(opType.toLowerCase());
+    oclTranslation.append(opType);
     oclTranslation.append("\", Result).\n");
     return predName;
   }
