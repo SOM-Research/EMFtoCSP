@@ -46,16 +46,20 @@ public class EAssociation {
   public String getSourceRoleName() {
     if (dstEnd.getEOpposite() == null)
       return srcEnd.getName();
-    return dstEnd.getEOpposite().getName();
+    else if (dstEnd.isContainment())
+    	return dstEnd.getEOpposite().getName();
+    return dstEnd.getName();	
   }
   
   public String getDestinationRoleName() {
+	  if (dstEnd.isContainer())
+		  return dstEnd.getEOpposite().getName();
     return dstEnd.getName();
   }
 
   public int getSourceLowerBound() {
     if (dstEnd.getEOpposite() == null)
-      return 1;
+      return 0;
     return dstEnd.getEOpposite().getLowerBound();
   }
 

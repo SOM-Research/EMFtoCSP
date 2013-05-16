@@ -312,7 +312,19 @@ linksConstraintMultiplicities4Aux(OClassA,N,LA) :-
       ( count(J,0,N2),param(I,Oid,LA,N) do
           K is I * N + J,
 	  listut:nth0(K,LA,Oid) ) ).
+	  
+% noSharing(ListOfLinkLists) :-
+% A class represented by its oid should not be linked  
+% to more than one containment link
 
+noSharing(ListOfLinkLists) :-
+    %printf("ListOfLinkLists %w", [ListOfLinkLists]),nl,
+	flatten(ListOfLinkLists,ListOfLinks),
+	(foreach(Link,ListOfLinks),foreach(CompOid,CompOids) do arg(2,Link,CompOid)),
+	%printf("CompOids %w", [CompOids]),nl,
+	ic_global:alldifferent(CompOids).
+	
+	
 differentLinks(LinkList):- 
   differentList(differenceForLinks, LinkList).
 
@@ -458,6 +470,19 @@ existsOidIn(OSub, OSuper) :-
      param(OidListSuper)
      do
         existsOidInList(Oid, OidListSuper)
+   ).
+
+% existsOidInOneOf(OAbstract, ListOfObjectLists) :-
+% if the super type is Abstract then it's Oids must exist in the one of the subtypes
+
+existsOidInOneOf(OAbstract, ListOfObjectLists) :-
+   flatten(ListOfObjectLists,All),
+   getOidList(OAbstract, OidListAbstract),
+   getOidList(All, OidListAll),
+   ( foreach(Oid, OidListAbstract),
+     param(OidListAll)
+     do
+        existsOidInList(Oid, OidListAll)
    ).
 
 % disjointOids( TypeList ):-

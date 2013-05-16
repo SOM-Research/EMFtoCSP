@@ -590,7 +590,9 @@ ocl_obj_equals(_, Obj1, Type1, Obj2, Type2, Result):-
 
 %ocl_obj_not_equals(Instances, Obj1, Type1, Obj2, Type2, Result) :-
 %   Result is true if Obj1 and Obj2 are different
-
+ocl_obj_not_equals(_,ocl_undef,_,ocl_undef,_,1):-!.
+ocl_obj_not_equals(_,ocl_undef,_,_,_,1):-!.
+ocl_obj_not_equals(_,_,_,ocl_undef,_,1):-!.
 ocl_obj_not_equals(Instances, Obj1, Type1, Obj2, Type2, Result):-
    ocl_obj_equals(Instances, Obj1, Type1, Obj2, Type2, Aux),
    ic:neg(Aux, Result).

@@ -111,8 +111,8 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
   }
 
   @Override
-  public List<EClass> getClassSubtypes(List<EClass> classList, EClass c) {
-    ArrayList<EClass> subTypesList = new ArrayList<EClass>(); 
+  public List<EClass> getClassSubtypes(List<EClass> classList, EClass c  ) {
+    ArrayList<EClass> subTypesList = new ArrayList<EClass>();  
     if (classList != null) 
       for (EClass cl : classList) 
         for (EClass superType : cl.getESuperTypes()) 
@@ -120,7 +120,16 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
             subTypesList.add(cl);
     return subTypesList.size() > 0 ? subTypesList : null;
   }
-
+  public void getClassSubtypes(List<EClass> classList , EClass c , List<EClass> nestedSubtypes){
+	  if (classList != null) 
+	      for (EClass cl : classList) 
+	        for (EClass superType : cl.getESuperTypes()) 
+	          if (c == superType){
+	        	  nestedSubtypes.add(cl);
+	        	  getClassSubtypes(classList , cl ,  nestedSubtypes);}
+	   
+  }
+  
   @Override
   public EClass getBaseClass(EClass c) {
     if (c.getESuperTypes() == null || (c.getESuperTypes() != null && c.getESuperTypes().size() == 0))
@@ -159,7 +168,22 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
       names.add(as.getName());   
     return names;
 	}
-
+	
+	public List<String> getAssociationNamesOfNonAbsClasses(){
+		List<EAssociation> asList = getAssociations();
+	    ArrayList<String> names = new ArrayList<String>();
+	    for(EAssociation as : asList)
+	    	if(!assWithAbsEnd(as))
+	    		names.add(as.getName());
+	    return names;
+	}
+	private boolean assWithAbsEnd(EAssociation as){
+		
+		EClass srcCls = as.getSourceEnd();
+		EClass trgCls = as.getDestinationEnd().getEReferenceType();
+		return (srcCls.isAbstract() && getClassSubtypes(getClasses(), srcCls)==null) || 
+				(trgCls.isAbstract() && getClassSubtypes(getClasses(), trgCls)==null);
+	}
   @Override
   public String getAssociationName(EAssociation as) {
     return as.getName();
