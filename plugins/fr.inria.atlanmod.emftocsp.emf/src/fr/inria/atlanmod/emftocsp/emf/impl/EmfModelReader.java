@@ -141,16 +141,20 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
   
 	@Override
 	public List<EAssociation> getAssociations() {
+		
     HashMap<String, Boolean> procAs = new HashMap<String, Boolean>();
+    
     ArrayList<EAssociation> asList = new ArrayList<EAssociation>();
     
     List<EClass> cList = getClasses();
     for (EClass c : cList) 
       if (c.getEReferences() != null) 
         for (EReference ref : c.getEReferences()) {
+        	if (ref.isContainer()) continue;
           String dstRoleName = ref.getName();
           String srcRoleName = ref.getEOpposite() != null ? ref.getEOpposite().getName() : c.getName();
           String asName = srcRoleName.compareToIgnoreCase(dstRoleName) < 0 ? srcRoleName + "_" + dstRoleName : dstRoleName + "_" + srcRoleName; //$NON-NLS-1$ //$NON-NLS-2$
+          
           if (procAs.get(asName) == null || (procAs.get(asName) != null && !procAs.get(asName))) {
             procAs.put(asName, true);
             EAssociation as = new EAssociation(asName, c, ref);

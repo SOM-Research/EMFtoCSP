@@ -256,9 +256,9 @@ gviz_type_list(Instances, Object, TypeName, TypeList, ObjList) :-
    % Find the object with that oid within 
    gviz_findObjectByOid( ObjectList, Oid, Obj),     
    % Recursive call
-   gviz_type_list(Instances, Object, SubType, TypeAuxList, ObjAuxList),
+   gviz_type_list(Instances, Obj, SubType, TypeAuxList, ObjAuxList),
    append(TypeAuxList,[TypeName], TypeList),
-   append(ObjAuxList,[Obj], ObjList).
+   append(ObjAuxList,[Object], ObjList).
 
 gviz_type_list(_, Object, TypeName, TypeList, ObjList) :- 
    TypeList = [ TypeName ],
@@ -274,11 +274,13 @@ gviz_write_object(Stream, Instances, Object, TypeName) :-
   % The identifier used within the GraphViz file will be   
   % type name in lower case + oid of the object:
   getOid(Object, Oid),
+  printf("1: %w", [Object]),nl,
   % Get the list of types of the object (the object may have attributes
   % in a class, one of its subclasses, ...)
   gviz_type_list(Instances, Object, TypeName, TypeList, ObjList),
   % Get the most concretetype
   nth1(1, TypeList, MostConcreteType), 
+  printf("2: %w", [MostConcreteType]),nl,
   printf(Stream, "%s%d [shape=record,label=\"{%s%d: %s |", 
          [TypeName, Oid, MostConcreteType, Oid, MostConcreteType]),
   % Write the list of attributes of the object
