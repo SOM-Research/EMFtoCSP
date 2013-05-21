@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="samplemodel" nsURI="http://samplemodel/1.0" nsPrefix="samplemodel">
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pets" upperBound="-1" eType="#//Animal"
+        containment="true" eOpposite="#//Animal/owner"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Animal">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner" eType="#//Person"
+        eOpposite="#//Person/pets"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Cat" eSuperTypes="#//Animal"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Dog" eSuperTypes="#//Animal"/>
+</ecore:EPackage>

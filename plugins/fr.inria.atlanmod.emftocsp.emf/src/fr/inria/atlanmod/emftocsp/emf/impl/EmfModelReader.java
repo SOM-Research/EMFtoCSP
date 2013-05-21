@@ -172,7 +172,7 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
       names.add(as.getName());   
     return names;
 	}
-	
+	@Override	
 	public List<String> getAssociationNamesOfNonAbsClasses(){
 		List<EAssociation> asList = getAssociations();
 	    ArrayList<String> names = new ArrayList<String>();

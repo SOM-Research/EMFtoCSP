@@ -129,7 +129,7 @@ public class ModelToEcl {
     s.append("],\n\t");
     
     s.append("\n\t");
-    s.append("CardVariables2=[");
+    s.append("CardNonAbsVariables=[");
     s.append(nameList2.substring(0, nameList2.length() - 2));
     s.append("],\n\t");
     return s.toString();
@@ -147,18 +147,18 @@ public class ModelToEcl {
     s.append("% cardinality constraints derived from containment tree (compositions)\n");
     for (EClass c : cList) {
     	boolean complete = true;
-//   	List<String> cardVars = getContainments(c);
-    	List<String> cardVars = new ArrayList<String>();
-		for (EReference ref : c.getEReferences()) {
-			if (ref.isContainer()) {
-				EAssociation assoc = getAssociation(ref);
-				cardVars.add("S" + assoc.getName().toLowerCase());
-				if(ref.getLowerBound() != 1) {
-					complete = false;
-				}
-			}
-		}
-	
+    	List<String> cardVars = getContainments(c,"S");
+//    	List<String> cardVars = new ArrayList<String>();
+//		for (EReference ref : c.getEReferences()) {
+//			if (ref.isContainer()) {
+//				EAssociation assoc = getAssociation(ref);
+//				cardVars.add("S" + assoc.getName().toLowerCase());
+//				if(ref.getLowerBound() != 1) {
+//					complete = false;
+//				}
+//			}
+//		}
+//	
 		if (! cardVars.isEmpty() ) {
 			s.append("\tS" + c.getName());
 			if (complete) {
@@ -180,9 +180,9 @@ public class ModelToEcl {
 
     for(IModelProperty prop : properties) {
       if (prop instanceof StrongSatisfiabilityModelProperty)
-        s.append("strongSatisfiability(CardVariables2),");
+        s.append("strongSatisfiability(CardNonAbsVariables),");
       if (prop instanceof WeakSatisfiabilityModelProperty)
-        s.append("\n\tweakSatisfiability(CardVariables),");
+        s.append("\n\tweakSatisfiability(CardNonAbsVariables),");
       if (prop instanceof LivelinessModelProperty) {
         List<String> liveliness = prop.getTargetModelElementsNames();
         for (String cName : liveliness) {
@@ -220,11 +220,12 @@ public class ModelToEcl {
     return s.toString();    
   }
   
-  private List<String> getContainments(EClass c) {
+  private List<String> getContainments(EClass c, String s) {
 	List<String> cardVars= new ArrayList<String>();
 	for (EAssociation as : asList) {
-		if ( as.getDestinationEnd().isContainment() && as.getDestinationEnd().getEReferenceType() == c )
-			cardVars.add("S" + as.getName().toLowerCase());
+		if ( (as.getDestinationEnd().isContainment() && as.getDestinationEnd().getEReferenceType() == c) ||
+				(as.getDestinationEnd().isContainer() && as.getDestinationEnd().getEOpposite().getEReferenceType() == c))
+			cardVars.add( s + as.getName().toLowerCase());
 	}
 
 	return cardVars;
@@ -364,6 +365,18 @@ protected String genCardinalityInstantiationSection() {
       s.append("(Instances,\"" + asName.toLowerCase() + "\"");
       s.append("),\n\t");
     }     
+    
+    for (EClass c : cList){
+    	List <String> contList = getContainments(c,"L");
+    	if (contList.size() > 1)
+    	{	String st="noSharing([";
+    		for (String str : contList){
+    			st+=(str+", ");
+    		}
+    		st=st.substring(0,st.length()-2);
+    		st+="]),\n\t";
+    		s.append(st);}
+    }
     return s.toString(); 
   }
   

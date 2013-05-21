@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="Graph" nsURI="graph_simple" nsPrefix="graph_simple">
+  <eClassifiers xsi:type="ecore:EClass" name="Graph">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="id1006s" upperBound="-1"
+        eType="#//ID1006" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tBooleans" upperBound="-1"
+        eType="#//TBoolean" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tChars" upperBound="-1"
+        eType="#//TChar" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tBytes" upperBound="-1"
+        eType="#//TByte" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tShorts" upperBound="-1"
+        eType="#//TShort" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tInts" upperBound="-1"
+        eType="#//TInt" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tLongs" upperBound="-1"
+        eType="#//TLong" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tFloats" upperBound="-1"
+        eType="#//TFloat" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tDoubles" upperBound="-1"
+        eType="#//TDouble" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tStrings" upperBound="-1"
+        eType="#//TString" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ID1006">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outID1008s" upperBound="-1"
+        eType="#//TString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TString">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TBoolean">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TChar">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EChar"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TByte">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EByte"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TShort">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EShort"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TInt">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TLong">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TFloat">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TDouble">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+  </eClassifiers>
+</ecore:EPackage>

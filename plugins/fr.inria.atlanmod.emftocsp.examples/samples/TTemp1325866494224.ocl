@@ -1,0 +1,5 @@
+package Graph
+
+context ID1006 inv maxElems: outID1008s->size() <= 1
+
+endpackage

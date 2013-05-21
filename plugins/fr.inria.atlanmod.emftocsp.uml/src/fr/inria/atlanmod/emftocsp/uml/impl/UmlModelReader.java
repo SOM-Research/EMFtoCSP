@@ -155,5 +155,17 @@ public class UmlModelReader implements IModelReader<UMLResource, Package, Class,
       if (pkgElement instanceof Association) 
         asList.add((Association)pkgElement);
     return asList;
-  }		
+  }
+
+@Override
+public void getClassSubtypes(List<Class> cList, Class c, List<Class> subTypes) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public List<String> getAssociationNamesOfNonAbsClasses() {
+	// TODO Auto-generated method stub
+	return new ArrayList<String>();
+	}		
 }

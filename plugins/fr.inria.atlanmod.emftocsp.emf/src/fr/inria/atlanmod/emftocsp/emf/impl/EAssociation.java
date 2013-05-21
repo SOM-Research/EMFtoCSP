@@ -60,8 +60,10 @@ public class EAssociation {
   }
 
   public int getSourceUpperBound() {
-    if (dstEnd.getEOpposite() == null)
+    if (dstEnd.getEOpposite() == null && dstEnd.isContainment())
       return 1;
+    else if (dstEnd.getEOpposite() == null )
+    	return -1;
     return dstEnd.getEOpposite().getUpperBound();
   }  
   
