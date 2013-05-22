@@ -515,7 +515,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
     if (opCSPName.equals("not"))
       return trans1ParamLogicOp(callExp, sourceResult, argumentResults);
      
-    if (callExp.getSource().getType().getName().contains("String")) {
+    if (callExp.getSource().getType() instanceof PrimitiveType && callExp.getSource().getType().getName().equals("String")) {
         return transOpOverStrings(callExp, sourceResult, argumentResults);
     }
 
