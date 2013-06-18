@@ -23,14 +23,14 @@ import fr.inria.atlanmod.emftocsp.ui.widgets.IElementSelectionWidget;
  *
  */
 public class ResultLocationSelectionPage extends SelectionPage {
-	IModelToCspSolver<?> modelSolver;
+	IModelToCspSolver<?,?> modelSolver;
 	
-	public ResultLocationSelectionPage(String pageName, String description, IStructuredSelection selection, Collection<String> allowedTypes, IModelToCspSolver<?> modelSolver) {
+	public ResultLocationSelectionPage(String pageName, String description, IStructuredSelection selection, Collection<String> allowedTypes, IModelToCspSolver<?,?> modelSolver) {
 		super(pageName,description, selection, allowedTypes);
 		this.modelSolver = modelSolver;
 	}
 
-	public ResultLocationSelectionPage(String pageName, String description, IStructuredSelection selection, Collection<String> allowedTypes, boolean mandatorySelection, IModelToCspSolver<?> modelSolver) {
+	public ResultLocationSelectionPage(String pageName, String description, IStructuredSelection selection, Collection<String> allowedTypes, boolean mandatorySelection, IModelToCspSolver<?,?> modelSolver) {
 		super(pageName,description, selection, allowedTypes, mandatorySelection);
 		this.modelSolver = modelSolver;
 	}

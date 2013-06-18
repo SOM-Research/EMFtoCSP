@@ -13,6 +13,8 @@ package fr.inria.atlanmod.emftocsp.uml.impl;
 
 import org.eclipse.uml2.uml.resource.UMLResource;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+
 import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
 import fr.inria.atlanmod.emftocsp.uml.IUmlModelToCspSolverFactory;
 
@@ -23,7 +25,8 @@ import fr.inria.atlanmod.emftocsp.uml.IUmlModelToCspSolverFactory;
 public class UmlModelToCspSolverFactory implements IUmlModelToCspSolverFactory {
 
 	@Override
-	public IModelToCspSolver<UMLResource> getModelToCspSolver() {
-		return new UmlModelToCspSolver();
+	public IModelToCspSolver<UMLResource, CompoundTerm> getModelToCspSolver() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

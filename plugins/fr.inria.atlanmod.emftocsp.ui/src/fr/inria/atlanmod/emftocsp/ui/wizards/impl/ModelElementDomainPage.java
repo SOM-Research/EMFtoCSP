@@ -84,13 +84,13 @@ public class ModelElementDomainPage extends WizardPage {
   private final static int ASSOCIATION = 2;
   private TreeViewer treeViewer;
   private Map<String, String> modelElementsDomain;
-  private IModelToCspSolver<?> modelSolver;
+  private IModelToCspSolver<?,?> modelSolver;
   
   private class StructuralNode {
     private int nodeType;
-    IModelToCspSolver<?> modelSolver;
+    IModelToCspSolver<?,?> modelSolver;
         
-    public StructuralNode(int nodeType, IModelToCspSolver<?> modelSolver) {
+    public StructuralNode(int nodeType, IModelToCspSolver<?,?> modelSolver) {
       this.nodeType = nodeType;
       this.modelSolver = modelSolver;
     }
@@ -122,9 +122,9 @@ public class ModelElementDomainPage extends WizardPage {
     private StructuralNode classContainerNode;
     private StructuralNode associationContainerNode;
     private ArrayList<StructuralNode> structuralNodes;
-    IModelToCspSolver<?> modelSolver;
+    IModelToCspSolver<?,?> modelSolver;
     
-    public ModelTreeContentProvider(IModelToCspSolver<?> modelSolver) {
+    public ModelTreeContentProvider(IModelToCspSolver<?,?> modelSolver) {
       classContainerNode = new StructuralNode(CLASS, modelSolver);
       associationContainerNode = new StructuralNode(ASSOCIATION, modelSolver);
       structuralNodes = new ArrayList<StructuralNode>();
@@ -196,7 +196,7 @@ public class ModelElementDomainPage extends WizardPage {
     }   
   }
 
-  public ModelElementDomainPage(String pageName, IModelToCspSolver<?> modelSolver) {
+  public ModelElementDomainPage(String pageName, IModelToCspSolver<?,?> modelSolver) {
   	super(pageName);
   	setTitle(pageName);
   	String description = Messages.ModelElementDomainPage_0;

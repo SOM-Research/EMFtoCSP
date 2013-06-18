@@ -19,7 +19,10 @@ import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.resource.UMLResource;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+
 import fr.inria.atlanmod.emftocsp.ICspCodeGenerator;
+import fr.inria.atlanmod.emftocsp.IModelBuilder;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IOclParser;
 import fr.inria.atlanmod.emftocsp.impl.ModelToCspSolver;
@@ -28,7 +31,7 @@ import fr.inria.atlanmod.emftocsp.impl.ModelToCspSolver;
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public class UmlModelToCspSolver extends ModelToCspSolver<UMLResource> {
+public class UmlModelToCspSolver extends ModelToCspSolver<UMLResource,CompoundTerm> {
   UMLResource umlModelResource;
   UmlModelReader modelReader;
   UmlOclParser oclParser;
@@ -76,5 +79,20 @@ public class UmlModelToCspSolver extends ModelToCspSolver<UMLResource> {
   @Override
   public ICspCodeGenerator<UMLResource, Package, Class, Association, Property, Operation, Constraint> getCspCodeGenerator() {
     return (ICspCodeGenerator<UMLResource, Package, Class, Association, Property, Operation, Constraint>)cspCodeGenerator;
-  }  
+  }
+
+
+@Override
+public void setBuilder(
+		IModelBuilder<UMLResource, ?, ?, ?, ?, ?, CompoundTerm> builder) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public IModelBuilder<UMLResource, ?, ?, ?, ?, ?, CompoundTerm> getBuilder() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
 }

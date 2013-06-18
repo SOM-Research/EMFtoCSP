@@ -36,10 +36,10 @@ import fr.inria.atlanmod.emftocsp.ui.wizards.IWizardNavigation;
  */
 public abstract class ValidationWizard extends Wizard {
 	IWizardNavigation wizardNavigation;
-	IModelToCspSolver<?> modelSolver;
+	IModelToCspSolver<?,?> modelSolver;
 	String logFileName;
 	
-	public ValidationWizard(IWizardNavigation wizardNavigation, IModelToCspSolver<?> modelSolver) {
+	public ValidationWizard(IWizardNavigation wizardNavigation, IModelToCspSolver<?,?> modelSolver) {
 		this.wizardNavigation = wizardNavigation;
 		this.modelSolver = modelSolver;		
 		logFileName = modelSolver.getModelLocation() + modelSolver.getModelFileName() + ".log";

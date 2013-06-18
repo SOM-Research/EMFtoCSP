@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ecore:EPackage xmi:version="2.0"
-    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="eShop"
-    nsURI="http://www.example.com/" nsPrefix="eShop">
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="eShop" nsURI="http://www.example.com/" nsPrefix="eShop">
   <eClassifiers xsi:type="ecore:EClass" name="Customer">
     <eOperations name="newCustomer" eType="#//Customer">
       <eParameters name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
@@ -35,15 +33,15 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="purchaser" lowerBound="1"
         eType="#//Customer" eOpposite="#//Customer/sale"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lines" upperBound="-1"
+        eType="#//SaleLine" eOpposite="#//SaleLine/sale"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SaleLine">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="quantity" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="sale" eType="#//Sale" eOpposite="#//SaleLine/lines"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sale" eType="#//Sale" eOpposite="#//Sale/lines"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="product" lowerBound="1"
         eType="#//Product" eOpposite="#//Product/salesLines"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="lines" lowerBound="1" upperBound="-1"
-        eType="#//SaleLine" eOpposite="#//SaleLine/sale"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Product">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="price" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>

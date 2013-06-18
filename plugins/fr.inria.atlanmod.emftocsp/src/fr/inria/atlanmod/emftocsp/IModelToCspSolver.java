@@ -17,57 +17,65 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 
+
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public interface IModelToCspSolver<R> {
-	
+public interface IModelToCspSolver<R,ST> {
+
 	public void setModel(R modelResource);
-	
+
 	public R getModel();
-	
-  public void setModelFileName(String filename);
-  
+
+	public void setModelFileName(String filename);
+
 	public String getModelFileName();
-	
+
 	public String getModelLocation();
-	
+
 	public IModelReader<R, ?, ?, ?, ?, ?> getModelReader();
 
-  public IOclParser<?, R> getOclParser();
-	
-  public void setCspCodeGenerator(ICspCodeGenerator<R, ?, ?, ?, ?, ?, ?> cspCodeGenerator);
-  
+	public IOclParser<?, R> getOclParser();
+
+	public void setCspCodeGenerator(ICspCodeGenerator<R, ?, ?, ?, ?, ?, ?> cspCodeGenerator);
+
 	public ICspCodeGenerator<R, ?, ?, ?, ?, ?, ?> getCspCodeGenerator();
 
 	public void setConstraintsDocument(IFile constraintsDocument);
-		
+
 	public IFile getConstraintsDocument();
-	
-  public void setModelElementsDomain(Map<String, String> modelDomain);
-  
+
+	public void setModelElementsDomain(Map<String, String> modelDomain);
+
 	public Map<String, String> getModelElementsDomain();
-	
+
 	public void setResultLocation(IFolder resultLocation);
-	
+
 	public IFolder getResultLocation();
-	
-  public void setModelProperties(List<IModelProperty> modelProperties);
-  
+
+	public void setModelProperties(List<IModelProperty> modelProperties);
+
 	public List<IModelProperty> getModelProperties();
-	
+
 	public void setSolver(ICspSolver solver);
-	
+
 	public ICspSolver getSolver();
-	
+
 	public boolean solveModel() throws ProcessingException ;
 
-  public boolean solveModel(List<File> importLibs) throws ProcessingException ;	
-  
-  public Object getSolverEvaluationResult();
-  
-  public void setLogger(ILogger logger);
-  
-  public ILogger getLogger();
+	public boolean solveModel(List<File> importLibs) throws ProcessingException ;	
+
+	public Object getSolverEvaluationResult();
+
+	public void setLogger(ILogger logger);
+
+	public ILogger getLogger();
+
+	IModelBuilder<R, ?, ?, ?, ?, ?, ST> getBuilder();
+
+	void setBuilder(IModelBuilder<R, ?, ?, ?, ?, ?, ST> builder);
+
+	
+
 }

@@ -12,12 +12,14 @@ package fr.inria.atlanmod.emftocsp.uml;
 
 import org.eclipse.uml2.uml.resource.UMLResource;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+
 import fr.inria.atlanmod.emftocsp.IModelToCspSolverFactory;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public interface IUmlModelToCspSolverFactory  extends IModelToCspSolverFactory<UMLResource> {
+public interface IUmlModelToCspSolverFactory  extends IModelToCspSolverFactory<UMLResource,CompoundTerm> {
 
 }

@@ -12,12 +12,14 @@ package fr.inria.atlanmod.emftocsp.emf;
 
 import org.eclipse.emf.ecore.resource.Resource;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+
 import fr.inria.atlanmod.emftocsp.IModelToCspSolverFactory;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public interface IEmfModelToCspSolverFactory extends IModelToCspSolverFactory<Resource>  {
+public interface IEmfModelToCspSolverFactory extends IModelToCspSolverFactory<Resource,CompoundTerm>  {
 
 }

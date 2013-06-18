@@ -26,7 +26,7 @@ import fr.inria.atlanmod.emftocsp.ui.wizards.IWizardNavigation;
 public class ModelWizardNavigation implements IWizardNavigation {
   IWizardPage[] wizardPages = new IWizardPage[4];
 	
-	public ModelWizardNavigation(IModelToCspSolver<?> modelSolver) {
+	public ModelWizardNavigation(IModelToCspSolver<?,?> modelSolver) {
     wizardPages[0] = new OclFileSelectionPage("OCL constraints selection", Messages.ModelWizardNavigation_0, null, new ArrayList<String>(Arrays.asList("ocl")), false, modelSolver); //$NON-NLS-3$ //$NON-NLS-1$
     wizardPages[1] = new ModelElementDomainPage(Messages.ModelWizardNavigation_1, modelSolver);
     wizardPages[2] = new PropertiesSelectionPage(Messages.ModelWizardNavigation_2, modelSolver);

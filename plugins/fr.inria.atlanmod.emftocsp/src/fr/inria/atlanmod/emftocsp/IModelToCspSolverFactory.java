@@ -10,12 +10,13 @@
  *******************************************************************************/
 package fr.inria.atlanmod.emftocsp;
 
+
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public interface IModelToCspSolverFactory<R> {
+public interface IModelToCspSolverFactory<R,ST> {
 
-	IModelToCspSolver<R> getModelToCspSolver();
+	IModelToCspSolver<R, ST> getModelToCspSolver();
 	
 }

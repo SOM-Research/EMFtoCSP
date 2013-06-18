@@ -51,10 +51,10 @@ public class PropertiesSelectionPage extends WizardPage {
   private Button cmdLackOfConstraintsRedundancies;
   private Combo cbLackRedundancies1;
   private Combo cbLackRedundancies2;
-  IModelToCspSolver<?> modelSolver;
+  IModelToCspSolver<?,?> modelSolver;
   HashMap<String,Object> mapModelElementName;
   
-  public PropertiesSelectionPage(String pageName, IModelToCspSolver<?> modelSolver) {
+  public PropertiesSelectionPage(String pageName, IModelToCspSolver<?,?> modelSolver) {
 	  super(pageName);
 	  setTitle(pageName);
 	  String description = Messages.PropertiesSelectionPage_0;

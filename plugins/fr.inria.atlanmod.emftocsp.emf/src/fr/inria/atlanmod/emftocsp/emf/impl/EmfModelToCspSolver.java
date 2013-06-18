@@ -17,7 +17,10 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.ocl.ecore.Constraint;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+
 import fr.inria.atlanmod.emftocsp.ICspCodeGenerator;
+import fr.inria.atlanmod.emftocsp.IModelBuilder;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IOclParser;
 import fr.inria.atlanmod.emftocsp.impl.ModelToCspSolver;
@@ -26,11 +29,11 @@ import fr.inria.atlanmod.emftocsp.impl.ModelToCspSolver;
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public class EmfModelToCspSolver extends ModelToCspSolver<Resource> {
+public class EmfModelToCspSolver extends ModelToCspSolver<Resource,CompoundTerm> {
 	Resource emfModelResource;
 	EmfModelReader modelReader;
 	EmfOclParser oclParser;
-	ICspCodeGenerator<Resource, ?, ?, ?, ?, ?, ?> cspCodeGenerator;
+	ICspCodeGenerator<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation,Constraint> cspCodeGenerator;
 	
 	@Override
 	public void setModel(Resource modelResource) {
@@ -59,6 +62,15 @@ public class EmfModelToCspSolver extends ModelToCspSolver<Resource> {
   }
   
   @Override
+  public IModelBuilder<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation, CompoundTerm> getBuilder() {
+	  if (emfModelResource == null)
+	      return null;
+	    if (builder == null)
+	      builder = new EmfModelBuilder(getModelReader());
+  	return (IModelBuilder<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation, CompoundTerm>) builder;
+  }
+  
+  @Override
   public IOclParser<Constraint, Resource> getOclParser() {
     if (oclParser == null)
       oclParser = new EmfOclParser();
@@ -67,7 +79,7 @@ public class EmfModelToCspSolver extends ModelToCspSolver<Resource> {
   
   @Override
   public void setCspCodeGenerator(ICspCodeGenerator<Resource, ?, ?, ?, ?, ?, ?> cspCodeGenerator) {
-    this.cspCodeGenerator = cspCodeGenerator;
+    this.cspCodeGenerator = (ICspCodeGenerator<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation, Constraint>) cspCodeGenerator;
   }  
 
   @SuppressWarnings("unchecked")
@@ -75,4 +87,17 @@ public class EmfModelToCspSolver extends ModelToCspSolver<Resource> {
   public ICspCodeGenerator<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation, Constraint> getCspCodeGenerator() {
     return (ICspCodeGenerator<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation, Constraint>)cspCodeGenerator;
   }
+
+@Override
+public void setBuilder(
+		IModelBuilder<Resource, ?, ?, ?, ?, ?, CompoundTerm> builder) {
+	this.builder = builder;
+	
+}
+
+
+
+
+
+
 }

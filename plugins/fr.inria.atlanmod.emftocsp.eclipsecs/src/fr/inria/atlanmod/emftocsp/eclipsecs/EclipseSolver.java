@@ -14,9 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import fr.inria.atlanmod.emftocsp.ICspSolver;
-import fr.inria.atlanmod.emftocsp.ProcessingException;
-
+import com.parctechnologies.eclipse.CompoundTerm;
 import com.parctechnologies.eclipse.EclipseEngine;
 import com.parctechnologies.eclipse.EclipseEngineOptions;
 import com.parctechnologies.eclipse.EclipseException;
@@ -24,16 +22,25 @@ import com.parctechnologies.eclipse.Fail;
 import com.parctechnologies.eclipse.OutOfProcessEclipse;
 import com.parctechnologies.eclipse.Throw;
 
+import fr.inria.atlanmod.emftocsp.ICspSolver;
+import fr.inria.atlanmod.emftocsp.ProcessingException;
+
+
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public class EclipseSolver implements ICspSolver {
+public class EclipseSolver implements ICspSolver <CompoundTerm>{
   private String imgGeneratorPath = ""; //$NON-NLS-1$
   private File imgResult;
-  
   private EclipseEngineOptions engineOptions = null;
   private EclipseEngine engine = null; 
+  private CompoundTerm solution = null;
+  
+  @Override
+  public CompoundTerm getSolution(){
+	  return solution;
+  }
 
   public EclipseSolver(String solverPath, String imgGeneratorPath) {
     this.imgGeneratorPath = imgGeneratorPath;
@@ -57,7 +64,8 @@ public class EclipseSolver implements ICspSolver {
       query.append("findSolutions(I),gviz_draw_object_diagram(\""); //$NON-NLS-1$
       query.append(dotFile.getAbsolutePath().replaceAll("\\\\", "\\\\\\\\")); //$NON-NLS-1$ //$NON-NLS-2$
       query.append("\",I)"); //$NON-NLS-1$
-      engine.rpc(query.toString());
+      solution = engine.rpc(query.toString());    
+      System.out.println();
       disposeEngineProcess();
       String imgFilePath = srcFile.getAbsolutePath() + ".png"; //$NON-NLS-1$
       setResult(generateImage(imgFilePath, dotFile));
@@ -79,7 +87,8 @@ public class EclipseSolver implements ICspSolver {
 	}
   }
   
-  @Override
+
+@Override
   public Object getResult() {
     return imgResult;
   }
@@ -142,5 +151,6 @@ public class EclipseSolver implements ICspSolver {
     catch (EclipseException e) {
       e.printStackTrace();
     }
-  } 
+  }
+  
 }

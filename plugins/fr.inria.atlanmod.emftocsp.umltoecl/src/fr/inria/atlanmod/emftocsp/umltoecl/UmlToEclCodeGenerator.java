@@ -24,6 +24,8 @@ import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.resource.UMLResource;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+
 import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
@@ -37,9 +39,9 @@ import fr.inria.atlanmod.emftocsp.uml.impl.UmlCspCodeGenerator;
  *
  */
 public class UmlToEclCodeGenerator extends UmlCspCodeGenerator {
-  IModelToCspSolver<UMLResource> modelSolver;
+  IModelToCspSolver<UMLResource,CompoundTerm> modelSolver;
 
-  public UmlToEclCodeGenerator(IModelToCspSolver<UMLResource> modelSolver) {
+  public UmlToEclCodeGenerator(IModelToCspSolver<UMLResource,CompoundTerm> modelSolver) {
     this.modelSolver = modelSolver;
   }
   

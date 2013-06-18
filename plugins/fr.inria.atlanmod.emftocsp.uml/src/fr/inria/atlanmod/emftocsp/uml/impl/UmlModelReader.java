@@ -167,5 +167,11 @@ public void getClassSubtypes(List<Class> cList, Class c, List<Class> subTypes) {
 public List<String> getAssociationNamesOfNonAbsClasses() {
 	// TODO Auto-generated method stub
 	return new ArrayList<String>();
-	}		
+	}
+
+@Override
+public UMLResource getResource() {
+	// TODO Auto-generated method stub
+	return r;
+}		
 }

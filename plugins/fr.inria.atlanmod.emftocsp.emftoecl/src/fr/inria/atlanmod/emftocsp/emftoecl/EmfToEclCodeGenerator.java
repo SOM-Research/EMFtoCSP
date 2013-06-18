@@ -49,9 +49,9 @@ import fr.inria.atlanmod.emftocsp.impl.LackOfConstraintsSubsumptionsModelPropert
  *
  */
 public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
-  IModelToCspSolver<Resource> modelSolver;
+  IModelToCspSolver<Resource,?> modelSolver;
   
-  public EmfToEclCodeGenerator(IModelToCspSolver<Resource> modelSolver) {
+  public EmfToEclCodeGenerator(IModelToCspSolver<Resource,?> modelSolver) {
     this.modelSolver = modelSolver;
   }
     

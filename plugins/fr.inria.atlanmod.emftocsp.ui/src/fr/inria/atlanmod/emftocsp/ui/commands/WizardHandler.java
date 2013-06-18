@@ -11,6 +11,10 @@
 package fr.inria.atlanmod.emftocsp.ui.commands;
 
 import org.eclipse.core.commands.AbstractHandler;
+
+
+import com.parctechnologies.eclipse.CompoundTerm;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
@@ -69,18 +73,17 @@ public class WizardHandler extends AbstractHandler implements IHandler {
     ResourceSet rSet = new ResourceSetImpl();
     rSet.setPackageRegistry(EPackage.Registry.INSTANCE);
     Resource r = rSet.getResource(modelFileURI, true);
-    IModelToCspSolverFactory<Resource> modelSolverFactory = new EmfModelToCspSolverFactory();
+    IModelToCspSolverFactory<Resource,CompoundTerm> modelSolverFactory = new EmfModelToCspSolverFactory();
     
-    IModelToCspSolver<Resource> modelSolver = modelSolverFactory.getModelToCspSolver();
+    IModelToCspSolver<Resource,CompoundTerm> modelSolver = modelSolverFactory.getModelToCspSolver();
     modelSolver.setModelFileName(modelFile.getName());
     modelSolver.setModel(r);
     modelSolver.setSolver(solver);
     modelSolver.setCspCodeGenerator(new EmfToEclCodeGenerator(modelSolver));
-    
     modelSolver.setLogger(new FileLogger());
 //    modelSolver.setLogger(new FileLogger(modelFile.getRawLocation().toOSString().concat(".emftocsp.log")));
     modelSolver.getLogger().writeInfoMessage(this.getClass().toString(), "Starting EMFtoCSP GUI");
-       
+    modelSolver.getBuilder();   
     ValidationWizard wizard = new ModelSelectedWizard(modelSolver);
     WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
     dialog.open();
@@ -92,9 +95,9 @@ public class WizardHandler extends AbstractHandler implements IHandler {
 
     ResourceSet rSet = new ResourceSetImpl();
     UMLResource r = (UMLResource)rSet.getResource(modelFileURI, true);
-    IModelToCspSolverFactory<UMLResource> modelSolverFactory = new UmlModelToCspSolverFactory();
+    IModelToCspSolverFactory<UMLResource,CompoundTerm> modelSolverFactory = new UmlModelToCspSolverFactory();
     
-    IModelToCspSolver<UMLResource> modelSolver = modelSolverFactory.getModelToCspSolver(); 
+    IModelToCspSolver<UMLResource,CompoundTerm> modelSolver = modelSolverFactory.getModelToCspSolver(); 
     modelSolver.setModelFileName(modelFile.getName());
     modelSolver.setModel(r);
     modelSolver.setSolver(solver);

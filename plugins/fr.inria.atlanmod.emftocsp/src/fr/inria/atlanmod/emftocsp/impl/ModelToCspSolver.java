@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IPath;
 import fr.inria.atlanmod.emftocsp.ICspCodeGenerator;
 import fr.inria.atlanmod.emftocsp.ICspSolver;
 import fr.inria.atlanmod.emftocsp.ILogger;
+import fr.inria.atlanmod.emftocsp.IModelBuilder;
 import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
@@ -35,17 +36,18 @@ import fr.inria.atlanmod.emftocsp.ProcessingException;
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public abstract class ModelToCspSolver<R> implements IModelToCspSolver<R> {
+public abstract class ModelToCspSolver<R,ST> implements IModelToCspSolver<R,ST> {
   IFile constraintsDocument;
   IFolder resultLocation;
   HashMap<String, String> modelElementsDomain;
   List<IModelProperty> modelProperties;
-  ICspSolver solver;
+  ICspSolver<ST> solver;
   String modelFilename;
   ILogger logger;
+  protected IModelBuilder<R, ?,?,?,?,?,ST> builder;
 
-  @Override
-  public abstract void setModel(R modelResource);
+@Override  
+  public abstract 	IModelBuilder<R, ?, ?, ?, ?, ?, ST> getBuilder();
   
   @Override
   public abstract R getModel();
@@ -137,11 +139,21 @@ public abstract class ModelToCspSolver<R> implements IModelToCspSolver<R> {
     IPath cspCodeFilePath = getResultLocation().getRawLocation().append(cspCodeFileName);
     File cspCodeFile = new File(cspCodeFilePath.toOSString());
     String cspCode = getCspCodeGenerator().getCspCode();
+    boolean solved=false;
     try {
 	    PrintWriter out = new PrintWriter(cspCodeFile);
 	    out.println(cspCode);
 	    out.flush();    
-	    return solver.solveCSP(cspCodeFile, importLibs);
+	    solved = solver.solveCSP(cspCodeFile, importLibs);
+	    if(solver.getSolution()!=null){
+	    builder.setSolution(solver.getSolution());
+	    builder.decorticateResult();
+	    String path ="\\" + modelFilename + ".xmi";
+	    path=resultLocation.getFullPath().toOSString()+path;
+	    //System.out.println("PATH IS "+path);
+	    builder.generateInstance("file://"+cspCodeFile.getAbsolutePath()+".xmi");
+	    }
+	    return solved;
     } catch (IOException e) {
     	throw new ProcessingException(e);
     }
@@ -162,5 +174,5 @@ public abstract class ModelToCspSolver<R> implements IModelToCspSolver<R> {
     return logger;
   }
   
-  
+
 }

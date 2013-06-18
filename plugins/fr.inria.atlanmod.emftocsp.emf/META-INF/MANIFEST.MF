@@ -13,3 +13,4 @@ Require-Bundle: fr.inria.atlanmod.emftocsp;bundle-version="1.0.0",
 Export-Package: fr.inria.atlanmod.emftocsp.emf,
  fr.inria.atlanmod.emftocsp.emf.impl
 Bundle-Vendor: %Bundle-Vendor
+Import-Package: com.parctechnologies.eclipse

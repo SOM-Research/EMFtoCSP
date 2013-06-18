@@ -12,6 +12,8 @@ package fr.inria.atlanmod.emftocsp.emf.impl;
 
 import org.eclipse.emf.ecore.resource.Resource;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+
 import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
 import fr.inria.atlanmod.emftocsp.emf.IEmfModelToCspSolverFactory;
 
@@ -22,7 +24,7 @@ import fr.inria.atlanmod.emftocsp.emf.IEmfModelToCspSolverFactory;
 public class EmfModelToCspSolverFactory implements IEmfModelToCspSolverFactory {
 
 	@Override
-	public IModelToCspSolver<Resource> getModelToCspSolver() {
+	public IModelToCspSolver<Resource,CompoundTerm> getModelToCspSolver() {
 		return new EmfModelToCspSolver();
 	}
 

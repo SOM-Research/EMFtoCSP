@@ -31,7 +31,6 @@ import fr.inria.atlanmod.emftocsp.IModelReader;
  */
 public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation> {
   Resource r;
-  
   public EmfModelReader(Resource r) {
     this.r = r;
   }
@@ -40,7 +39,11 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
   public Resource getModelResource() {
     return r;
   }
-
+  @Override
+  public Resource getResource() {
+	return r;
+}
+  
   @Override
   public List<EPackage> getPackages() {
           ArrayList<EPackage> pList = new ArrayList<EPackage>();
@@ -94,11 +97,12 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
 
   @Override
   public List<EAttribute> getClassAttributes(EClass c) {
-    ArrayList<EAttribute> atList = new ArrayList<EAttribute>();
-    if (c.getEAttributes() != null)
-      for (EAttribute at : c.getEAttributes())
-        atList.add(at);
-    return atList;
+//    ArrayList<EAttribute> atList = new ArrayList<EAttribute>();
+//    if (c.getEAttributes() != null)
+//      for (EAttribute at : c.getEAttributes())
+//        atList.add(at);
+//    return atList;
+	  return c.getEAttributes();
   }
 
   @Override

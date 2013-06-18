@@ -15,15 +15,15 @@ package fr.inria.atlanmod.emftocsp;
  *
  */
 public interface ILogger {
-	
+
 	public void writeInfoMessage(String context, String infoMessage);
-	
+
 	public void writeWarningMessage(String context, String warningMessage);
-	
+
 	public void writeErrorMessage(String context, String errorMessage);
-	
+
 	public void close();
 
-  public void close(String path);
-	
+	public void close(String path);
+
 }

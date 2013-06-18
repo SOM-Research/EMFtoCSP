@@ -13,16 +13,21 @@ package fr.inria.atlanmod.emftocsp;
 import java.io.File;
 import java.util.List;
 
+import com.parctechnologies.eclipse.CompoundTerm;
+
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-public interface ICspSolver {
-  
-  public boolean solveCSP(File srcFile, List<File> libs) throws ProcessingException;  
+public interface ICspSolver <ST> {  
+
+public boolean solveCSP(File srcFile, List<File> libs) throws ProcessingException;  
 
   public boolean solveCSP(File srcFile) throws ProcessingException;  
   
   public Object getResult();
+
+public ST getSolution();
+
   
 }

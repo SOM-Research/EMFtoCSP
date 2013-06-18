@@ -21,7 +21,7 @@ import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
  */
 public class ModelSelectedWizard extends ValidationWizard {
 
-	public ModelSelectedWizard(IModelToCspSolver<?> modelSolver) {
+	public ModelSelectedWizard(IModelToCspSolver<?,?> modelSolver) {
 		super(new ModelWizardNavigation(modelSolver), modelSolver);
     ImageDescriptor image = AbstractUIPlugin.imageDescriptorFromPlugin("fr.inria.atlanmod.emftocsp.ui", "resources/icons/Checked64.png"); //$NON-NLS-1$ //$NON-NLS-2$
     setDefaultPageImageDescriptor(image);   
