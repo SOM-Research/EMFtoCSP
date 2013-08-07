@@ -43,7 +43,6 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
   public Resource getResource() {
 	return r;
 }
-  
   @Override
   public List<EPackage> getPackages() {
           ArrayList<EPackage> pList = new ArrayList<EPackage>();
@@ -120,7 +119,7 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
     if (classList != null) 
       for (EClass cl : classList) 
         for (EClass superType : cl.getESuperTypes()) 
-          if (c == superType)
+          if (c.equals(superType))
             subTypesList.add(cl);
     return subTypesList.size() > 0 ? subTypesList : null;
   }

@@ -27,6 +27,6 @@ public class UmlModelToCspSolverFactory implements IUmlModelToCspSolverFactory {
 	@Override
 	public IModelToCspSolver<UMLResource, CompoundTerm> getModelToCspSolver() {
 		// TODO Auto-generated method stub
-		return null;
+		return new UmlModelToCspSolver();
 	}
 }

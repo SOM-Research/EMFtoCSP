@@ -13,7 +13,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFolder;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -24,8 +27,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -39,7 +40,6 @@ import fr.inria.atlanmod.emftocsp.impl.ModelBuilder;
 import fr.inria.atlanmod.emftocsp.modelbuilder.AssocStruct;
 import fr.inria.atlanmod.emftocsp.modelbuilder.Field;
 import fr.inria.atlanmod.emftocsp.modelbuilder.ObjectStruct;
-import fr.inria.atlanmod.emftocsp.modelbuilder.Struct;
 
 /**
  * @author abenelal
@@ -112,16 +112,14 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 			if (isRoot(obj))
 				resource.getContents().add(obj);
 		}
-		
-		
-		try{
-			
+		try{			
 			resource.save(options);
 		}catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 	}
+	@SuppressWarnings("unchecked")
 	private void setupEReferences() {
 		
 		for (Iterator<AssocStruct> assocIt = assocStructures.iterator();assocIt.hasNext();){
@@ -166,20 +164,33 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 			int objOid = (Integer) struct.getOid();
 			idToObj.put(new Point(associatedClass.getClassifierID(),objOid), obj);
 			List<EAttribute> attList = associatedClass.getEAllAttributes();
-		
+			
 			if (attList.size() != 0){
 				for (int i=1; i<= attList.size();i++){
 					Field field = struct.getFields().get(i);
 					Object value = null;
-					if (attList.get(i-1).getEType().getName().equals("EString"))
+					String stringType = attList.get(i-1).getEType().getName();
+					System.out.println(stringType);
+					
+					if (stringType.equals("EString") 
+							|| attList.get(i-1).getEType().getName().contains("EChar"))
 						value = " ";
-					else if (attList.get(i-1).getEType().getName().equals("EBoolean"))
+					else if (stringType.contains("EBoolean"))
 						if (((Integer)field.getValue())==0)
 							value = false;
 						else value =true;
-					else
-						value = field.getValue();
-					obj.eSet(attList.get(i-1), value);
+					else if (stringType.contains("EByte")){
+						int cast = (Integer)field.getValue();
+							value = new Byte(String.valueOf(cast)) ;}
+					else if (stringType.equals("EBigInteger"))
+							value = new BigInteger( BigInteger.valueOf(Long.parseLong(String.valueOf(field.getValue()))).toByteArray());
+					else if (attList.get(i-1).getEType().getName().equals("EBigDecimal"))
+							value = new BigDecimal(String.valueOf(field.getValue()).toCharArray());
+					else if (stringType.contains("ELong"))
+						value = Long.parseLong(String.valueOf(field.getValue()));
+					else value =  field.getValue();
+										
+					obj.eSet(attList.get(i-1), value);				
 				}
 			}
 			objList.add(obj);

@@ -223,8 +223,8 @@ public class ModelToEcl {
   private List<String> getContainments(EClass c, String s) {
 	List<String> cardVars= new ArrayList<String>();
 	for (EAssociation as : asList) {
-		if ( (as.getDestinationEnd().isContainment() && as.getDestinationEnd().getEReferenceType() == c) ||
-				(as.getDestinationEnd().isContainer() && as.getDestinationEnd().getEOpposite().getEReferenceType() == c))
+		if ( (as.getDestinationEnd().isContainment() && as.getDestinationEnd().getEReferenceType().equals(c)) ||
+				(as.getDestinationEnd().isContainer() && as.getDestinationEnd().getEOpposite().getEReferenceType().equals(c)))
 			cardVars.add( s + as.getName().toLowerCase());
 	}
 
@@ -234,7 +234,8 @@ public class ModelToEcl {
 /**
    * Returns the association that includes this reference.
    */
-  private EAssociation getAssociation(EReference ref) {
+  @SuppressWarnings("unused")
+private EAssociation getAssociation(EReference ref) {
 	  for (EAssociation as : asList) {
 		  EReference asRef1 = as.getDestinationEnd();
 		  EReference asRef2 = as.getDestinationEnd().getEOpposite();
@@ -751,7 +752,7 @@ protected String genCardinalityInstantiationSection() {
       List<EAttribute> atList = emfModelReader.getClassAttributes(c);
       List<EAttribute> atListNumeric = new ArrayList<EAttribute>();
       for (EAttribute at : atList) { 
-    	  if (! at.getEType().getInstanceClassName().contains("String") ) {
+    	  if (! (at.getEAttributeType().getName().equalsIgnoreCase("string") || at.getEAttributeType().getName().equalsIgnoreCase("string")) ) {
     		  atListNumeric.add(at);
     	  }
       }

@@ -96,9 +96,9 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
       s.append("\n");
       s.append(emfTranslator.genInstancesSection2());
       s.append("\n");
-      s.append(emfTranslator.genOclRootSection());
-      s.append("\n");
       s.append(emfTranslator.genAttributeLabelingSection());
+      s.append("\n");
+      s.append(emfTranslator.genOclRootSection());
       s.append("\n");
       s.append(emfTranslator.genStringLabelingSection());
       s.append("\n");
@@ -139,7 +139,7 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
         if (!c.getStereotype().equalsIgnoreCase("precondition") && !c.getStereotype().equalsIgnoreCase("postcondition")) {
           ExpressionInOCL oclExpression = (ExpressionInOCL) c.getSpecification();
           EClass contextCls = (EClass) c.getConstrainedElements().get(0);
-    	  
+ 
           insertQuantificationForSelf(helper, contextCls, oclExpression);          
 
           s.append(oclExpression.accept(oclVisitor));
@@ -217,12 +217,10 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
 	      selfDecl.setName("self");
 	      selfDecl.setType(contextCls);
 	      forAllExp.getIterator().add(selfDecl);
-	      forAllExp.setBody(bodyExp);
-	      
+	      forAllExp.setBody(bodyExp);	      
 	      helper.setContext(contextCls);
 	      OCLExpression<EClassifier> allInstancesExp = helper.createQuery(contextCls.getName() + ".allInstances()");
 	      forAllExp.setSource(allInstancesExp);
-
 	      oclExpression.setBodyExpression(forAllExp);
 	  }
 }

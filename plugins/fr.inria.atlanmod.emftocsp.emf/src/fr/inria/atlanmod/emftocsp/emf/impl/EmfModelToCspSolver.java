@@ -32,7 +32,7 @@ import fr.inria.atlanmod.emftocsp.impl.ModelToCspSolver;
 public class EmfModelToCspSolver extends ModelToCspSolver<Resource,CompoundTerm> {
 	Resource emfModelResource;
 	EmfModelReader modelReader;
-	EmfOclParser oclParser;
+	IOclParser<Constraint, Resource> oclParser;
 	ICspCodeGenerator<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation,Constraint> cspCodeGenerator;
 	
 	@Override

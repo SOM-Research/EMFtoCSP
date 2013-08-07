@@ -31,8 +31,15 @@ import org.eclipse.ocl.ecore.EcoreEnvironmentFactory;
 import org.eclipse.ocl.ecore.OCL;
 import org.eclipse.ocl.helper.OCLHelper;
 
+import org.eclipse.uml2.uml.Classifier;
+import org.eclipse.uml2.uml.Operation;
+import org.eclipse.uml2.uml.Property;
+
 import fr.inria.atlanmod.emftocsp.IOclParser;
 import fr.inria.atlanmod.emftocsp.ProcessingException;
+import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EClassifierUMLAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EOperationUMLAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EStructuralFeatureUMLAdapter;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
@@ -45,14 +52,15 @@ public class EmfOclParser implements IOclParser<Constraint, Resource> {
     OCL ocl = org.eclipse.ocl.ecore.OCL.newInstance();
     OCLHelper<EClassifier, EOperation, EStructuralFeature, Constraint> helper = ocl.createOCLHelper();
     
-    if (context instanceof EClassifier)
-      helper.setContext((EClassifier)context);
+    if (context instanceof EClassifier ){     
+    	  helper.setContext((EClassifier)context);
+      }
     else if (context instanceof EOperation) {
-      EOperation eOp = (EOperation) context;
+    	EOperation eOp = (EOperation) context;
       helper.setOperationContext(eOp.getEContainingClass(), eOp);
     } 
-    else if (context instanceof EStructuralFeature) {
-      EStructuralFeature sf = (EStructuralFeature) context;
+    else if (context instanceof EStructuralFeature  ) {
+    	EStructuralFeature sf = (EStructuralFeature) context;
       helper.setAttributeContext(sf.getEContainingClass(), sf);
     }
     try {
@@ -75,7 +83,6 @@ public class EmfOclParser implements IOclParser<Constraint, Resource> {
 	public List<Constraint> parseEmbeddedConstraints(Resource modelResource) {
 		List<Constraint> constraints = new ArrayList<Constraint>();
 		EmfModelReader modelReader = new EmfModelReader(modelResource);
-
 		for (EClass c : modelReader.getClasses()) {
 
 			// TODO: where are these constants defined?
@@ -160,7 +167,7 @@ public class EmfOclParser implements IOclParser<Constraint, Resource> {
 		constraints = oclParser.parse(document);
 	} catch (ParserException e) {
 		throw new ProcessingException( e );
-	}
+		}
     }
     return constraints;
   }  

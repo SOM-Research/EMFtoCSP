@@ -30,7 +30,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="fr.inria.atlanmod.emftocsp.ui.commands.WizardHandler"
+            class="fr.inria.atlanmod.emftocsp.ui.main.commands.WizardHandler"
             commandId="fr.inria.atlanmod.emftocsp.ui.commands.validate">
          <activeWhen>
             <iterate
@@ -59,7 +59,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="fr.inria.atlanmod.emftocsp.ui.preferences.PreferencePage"
+            class="fr.inria.atlanmod.emftocsp.ui.main.preferences.PreferencePage"
             id="fr.inria.atlanmod.emftocsp.ui.preferences.PreferencePage"
             name="%page.name">
       </page>

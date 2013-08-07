@@ -151,7 +151,7 @@ public abstract class ModelToCspSolver<R,ST> implements IModelToCspSolver<R,ST> 
 	    String path ="\\" + modelFilename + ".xmi";
 	    path=resultLocation.getFullPath().toOSString()+path;
 	    //System.out.println("PATH IS "+path);
-	    builder.generateInstance("file://"+cspCodeFile.getAbsolutePath()+".xmi");
+	    //builder.generateInstance("file://"+cspCodeFile.getAbsolutePath()+".xmi");
 	    }
 	    return solved;
     } catch (IOException e) {

@@ -19,7 +19,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
-import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnumLiteral;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
@@ -331,7 +330,7 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
 @Override
   protected String handleIteratorExp(IteratorExp<EClassifier, EParameter> callExp, String sourceResult, List<String> variableResults, String bodyResult) {    
     String itName = callExp.getName();
-    String type = itName.equalsIgnoreCase("forAll") ? "Boolean" : getType(callExp);
+    //String type = itName.equalsIgnoreCase("forAll") ? "Boolean" : getType(callExp);
 
     ++counter;
     String predName = "n" + itName + counter + constraintName;
@@ -395,13 +394,15 @@ public class OclToEcl extends AbstractVisitor<String, EClassifier, EOperation, E
 	  } else if (type instanceof SetType) {
 		  return "set";
 	  } else if (type instanceof PrimitiveType) {
-		  if (((PrimitiveType)type).getName().equals("Integer"))
+		  if (((PrimitiveType<?>)type).getName().equals("Integer"))
 		  return "int";
-		  else if(((PrimitiveType)type).getName().equals("Real"))
+		  else if(((PrimitiveType<?>)type).getName().equals("Real"))
 			  return "real";
-		  else if(((PrimitiveType)type).getName().equals("Boolean"))
+		  else if(((PrimitiveType<?>)type).getName().equals("Boolean"))
 			  return "boolean";
-		  throw new ProcessingException("Unsupported instance class for EDatatype: " +((PrimitiveType)type).getName() );
+		  else if(((PrimitiveType<?>)type).getName().equals("String"))
+			  return "string";
+		  throw new ProcessingException("Unsupported instance class for EDatatype: " +((PrimitiveType<?>)type) );
 					  
 	  } 
 	  return getName(type);
@@ -587,7 +588,8 @@ private boolean isCollectionType(EClassifier type) {
   private String transOpOverStrings(OperationCallExp<EClassifier, EOperation> callExp, String sourceResult, List<String> argumentResults) {
 	  EOperation op = callExp.getReferredOperation();
 	  String opName = getName(op);
-	  String opType = callExp.getType().getName();
+	 // String opType = callExp.getType().getName();
+		  @SuppressWarnings("unused")
 	  int params = -1;
 	  if (op.getEParameters() != null)
 		  params = op.getEParameters().size();
@@ -612,7 +614,7 @@ private boolean isCollectionType(EClassifier type) {
   }
 
   /***
-   * TO DO
+   * TODO
    * @param callExp
    * @param sourceResult
    * @param argumentResults
