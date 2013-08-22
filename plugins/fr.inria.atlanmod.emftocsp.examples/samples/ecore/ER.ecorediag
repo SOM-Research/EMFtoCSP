@@ -14,7 +14,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_thR3YVQ1EeG2VfjEGP1vRg" fontColor="4210752" fontName="Segoe UI" fontHeight="10" fillColor="13761016" lineColor="8421504"/>
     <element xmi:type="ecore:EClass" href="ER.ecore#//Schema"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thR3YlQ1EeG2VfjEGP1vRg" x="220" y="225"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thR3YlQ1EeG2VfjEGP1vRg" x="240" y="100"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_thTFhFQ1EeG2VfjEGP1vRg" type="1001">
     <children xmi:type="notation:Node" xmi:id="_thTskFQ1EeG2VfjEGP1vRg" type="4001"/>
@@ -34,7 +34,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_thTFhVQ1EeG2VfjEGP1vRg" fontColor="4210752" fontName="Segoe UI" fontHeight="10" fillColor="13761016" lineColor="8421504"/>
     <element xmi:type="ecore:EClass" href="ER.ecore#//Entity"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thTFhlQ1EeG2VfjEGP1vRg" x="15" y="260"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thTFhlQ1EeG2VfjEGP1vRg" x="95" y="190"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_thUToFQ1EeG2VfjEGP1vRg" type="1001">
     <children xmi:type="notation:Node" xmi:id="_thUTo1Q1EeG2VfjEGP1vRg" type="4001"/>
@@ -54,7 +54,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_thUToVQ1EeG2VfjEGP1vRg" fontColor="4210752" fontName="Segoe UI" fontHeight="10" fillColor="13761016" lineColor="8421504"/>
     <element xmi:type="ecore:EClass" href="ER.ecore#//Relship"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thUTolQ1EeG2VfjEGP1vRg" x="405" y="260"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thUTolQ1EeG2VfjEGP1vRg" x="510" y="185"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_thVhwFQ1EeG2VfjEGP1vRg" type="1001">
     <children xmi:type="notation:Node" xmi:id="_thVhw1Q1EeG2VfjEGP1vRg" type="4001"/>
@@ -74,7 +74,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_thVhwVQ1EeG2VfjEGP1vRg" fontColor="4210752" fontName="Segoe UI" fontHeight="10" fillColor="13761016" lineColor="8421504"/>
     <element xmi:type="ecore:EClass" href="ER.ecore#//RelshipEnd"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thVhwlQ1EeG2VfjEGP1vRg" x="200" y="315"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thVhwlQ1EeG2VfjEGP1vRg" x="435" y="330"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_thWI1VQ1EeG2VfjEGP1vRg" type="1001">
     <children xmi:type="notation:Node" xmi:id="_thWv4FQ1EeG2VfjEGP1vRg" type="4001"/>
@@ -98,7 +98,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_thWI1lQ1EeG2VfjEGP1vRg" fontColor="4210752" fontName="Segoe UI" fontHeight="10" fillColor="13761016" lineColor="8421504"/>
     <element xmi:type="ecore:EClass" href="ER.ecore#//Attribute"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thWI11Q1EeG2VfjEGP1vRg" x="15" y="360"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_thWI11Q1EeG2VfjEGP1vRg" x="80" y="355"/>
   </children>
   <styles xmi:type="notation:DiagramStyle" xmi:id="_thQpQVQ1EeG2VfjEGP1vRg"/>
   <element xmi:type="ecore:EPackage" href="ER.ecore#/"/>

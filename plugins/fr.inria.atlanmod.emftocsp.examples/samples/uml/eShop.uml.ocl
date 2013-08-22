@@ -2,11 +2,7 @@ package eShop
 
 context Product inv minStock: Product::allInstances()->forAll(p|p.stock>=5)
 
-context GoldCustomer inv salesAmount: GoldCustomer::allInstances()->forAll(g| g.sale->select(s| s.paid).amount->sum()>100000)
-
-endpackage
-
-package eShop
+context GoldCustomer inv salesAmount: GoldCustomer::allInstances()->forAll(g| g.sale->select(s| s.paid).amount->sum()>10)
 
 context Portal::removeGoldCategory(c:Customer):
 	pre: c.oclIsTypeOf(GoldCustomer) and c.sale->isEmpty()

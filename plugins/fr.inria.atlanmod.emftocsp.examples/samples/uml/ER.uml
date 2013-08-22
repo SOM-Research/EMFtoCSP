@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20110701" xmlns:xmi="http://www.omg.org/spec/XMI/20110701" xmlns:uml="http://www.eclipse.org/uml2/4.0.0/UML" xmi:id="_GyRVoApZEeOfALCz6Mg0oA" name="ER">
+  <eAnnotations xmi:id="_TEmPoAppEeOfALCz6Mg0oA" source="http://www.eclipse.org/emf/2002/Ecore">
+    <details xmi:id="_WavFAAppEeOfALCz6Mg0oA" key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    <details xmi:id="_aXywcAppEeOfALCz6Mg0oA" key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    <details xmi:id="_avYKAAppEeOfALCz6Mg0oA" key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot&#xD;&#xA;"/>
+  </eAnnotations>
+  <packagedElement xmi:type="uml:Class" xmi:id="_oN14EApaEeOfALCz6Mg0oA" name="Schema">
+    <eAnnotations xmi:id="_mnlHEAppEeOfALCz6Mg0oA" source="http://www.eclipse.org/emf/2002/Ecore">
+      <details xmi:id="_r19QcAppEeOfALCz6Mg0oA" key="constraints" value="ERN RN EN"/>
+    </eAnnotations>
+    <eAnnotations xmi:id="_pgWrAAppEeOfALCz6Mg0oA" source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details xmi:id="_wGLIcAppEeOfALCz6Mg0oA" key="ERN" value="self.entities->forAll(e : Entity | relships->forAll(r : Relship | e.name &lt;> r.name))"/>
+      <details xmi:id="_elZj4ApqEeO7wrhqmzCMrg" key="RN" value="relships->forAll(r1 : Relship, r2 : Relship | r1.name = r2.name implies r1 = r2)"/>
+      <details xmi:id="_fA_6wApqEeO7wrhqmzCMrg" key="EN" value="self.entities->forAll(e1 : Entity, e2 : Entity | e1.name = e2.name implies e1 = e2)"/>
+    </eAnnotations>
+    <ownedAttribute xmi:id="_DREBMAs0EeOsr5hf6E0HzQ" name="name">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_zRB4sApaEeOfALCz6Mg0oA" name="Relship">
+    <ownedAttribute xmi:id="_VDVI8As0EeOsr5hf6E0HzQ" name="name">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_3JWOEApaEeOfALCz6Mg0oA" name="RelshipEnd">
+    <ownedAttribute xmi:id="_1TCxsAs0EeOsr5hf6E0HzQ" name="name">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_-v3TgApaEeOfALCz6Mg0oA" name="Attribute">
+    <ownedAttribute xmi:id="_lJKUMApcEeOfALCz6Mg0oA" name="isKey">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Boolean"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_BfE2UApcEeOfALCz6Mg0oA" name="Entity">
+    <ownedAttribute xmi:id="_DjlfIAs1EeOsr5hf6E0HzQ" name="name">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_LhgIEApdEeOfALCz6Mg0oA" name="attributes" memberEnd="_Y-obkApdEeOfALCz6Mg0oA _1mCg4ApdEeOfALCz6Mg0oA">
+    <ownedEnd xmi:id="_Y-obkApdEeOfALCz6Mg0oA" name="attrs" type="_-v3TgApaEeOfALCz6Mg0oA" aggregation="composite" association="_LhgIEApdEeOfALCz6Mg0oA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_Wx_BAAphEeOfALCz6Mg0oA" value="1"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_KHR64ApfEeOfALCz6Mg0oA" value="*"/>
+      <defaultValue xmi:type="uml:LiteralString" xmi:id="_cEgnYApdEeOfALCz6Mg0oA" value=""/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_1mCg4ApdEeOfALCz6Mg0oA" name="entity" type="_BfE2UApcEeOfALCz6Mg0oA" association="_LhgIEApdEeOfALCz6Mg0oA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_6eRbIApdEeOfALCz6Mg0oA" name="entities" memberEnd="_a7LLUApeEeOfALCz6Mg0oA _Rl6PoApfEeOfALCz6Mg0oA">
+    <ownedEnd xmi:id="_a7LLUApeEeOfALCz6Mg0oA" name="entities" type="_BfE2UApcEeOfALCz6Mg0oA" aggregation="composite" association="_6eRbIApdEeOfALCz6Mg0oA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_YzcicAphEeOfALCz6Mg0oA" value="1"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_i3x1gApeEeOfALCz6Mg0oA" value="*"/>
+      <defaultValue xmi:type="uml:LiteralString" xmi:id="_ccxg8ApeEeOfALCz6Mg0oA" value="ents"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_Rl6PoApfEeOfALCz6Mg0oA" name="schema" type="_oN14EApaEeOfALCz6Mg0oA" association="_6eRbIApdEeOfALCz6Mg0oA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_7h-64ApdEeOfALCz6Mg0oA" name="relationshipEnds" memberEnd="_7c-NIApfEeOfALCz6Mg0oA _Crlv8ApgEeOfALCz6Mg0oA">
+    <ownedEnd xmi:id="_7c-NIApfEeOfALCz6Mg0oA" name="ends" type="_3JWOEApaEeOfALCz6Mg0oA" aggregation="composite" association="_7h-64ApdEeOfALCz6Mg0oA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_j0dCoAsuEeO7PL6x5_NcSQ" value="2"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_92fpQApfEeOfALCz6Mg0oA" value="*"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_Crlv8ApgEeOfALCz6Mg0oA" name="relship" type="_zRB4sApaEeOfALCz6Mg0oA" association="_7h-64ApdEeOfALCz6Mg0oA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_9P_74ApdEeOfALCz6Mg0oA" name="relationships" memberEnd="_Vm_C8ApgEeOfALCz6Mg0oA _XW-Z4ApgEeOfALCz6Mg0oA">
+    <ownedEnd xmi:id="_Vm_C8ApgEeOfALCz6Mg0oA" name="relships" type="_zRB4sApaEeOfALCz6Mg0oA" aggregation="composite" association="_9P_74ApdEeOfALCz6Mg0oA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_qjJvQAsuEeO7PL6x5_NcSQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_eD3IoApgEeOfALCz6Mg0oA" value="*"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_XW-Z4ApgEeOfALCz6Mg0oA" name="schema" type="_oN14EApaEeOfALCz6Mg0oA" association="_9P_74ApdEeOfALCz6Mg0oA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_-R7S8ApdEeOfALCz6Mg0oA" name="typeOf" memberEnd="_2o1TQApgEeOfALCz6Mg0oA _3XnE0ApgEeOfALCz6Mg0oA">
+    <ownedEnd xmi:id="_2o1TQApgEeOfALCz6Mg0oA" name="type" type="_BfE2UApcEeOfALCz6Mg0oA" association="_-R7S8ApdEeOfALCz6Mg0oA"/>
+    <ownedEnd xmi:id="_3XnE0ApgEeOfALCz6Mg0oA" name="ends" type="_3JWOEApaEeOfALCz6Mg0oA" association="_-R7S8ApdEeOfALCz6Mg0oA">
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_A-L9gAphEeOfALCz6Mg0oA" value="*"/>
+    </ownedEnd>
+  </packagedElement>
+</uml:Model>

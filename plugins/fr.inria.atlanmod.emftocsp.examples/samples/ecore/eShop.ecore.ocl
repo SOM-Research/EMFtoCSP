@@ -4,7 +4,7 @@ context Product
 inv minStock: Product::allInstances()->forAll(p|p.stock>=5)
 
 context GoldCustomer 
-inv salesAmount: GoldCustomer::allInstances()->forAll(g| g.sale->select(s| s.paid).amount->sum()>100000)
+inv salesAmount: GoldCustomer::allInstances()->forAll(g| g.sale->select(s| s.paid).amount->sum()>10000)
 
  context Portal::removeGoldCategory(c:Customer):
 	pre: c.oclIsTypeOf(GoldCustomer) and c.sale->isEmpty()
