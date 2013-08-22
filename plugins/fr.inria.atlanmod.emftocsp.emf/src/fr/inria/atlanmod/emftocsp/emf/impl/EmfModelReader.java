@@ -112,7 +112,7 @@ public class EmfModelReader implements IModelReader<Resource, EPackage, EClass, 
         opList.add(op);
     return opList; 
   }
-
+  
   @Override
   public List<EClass> getClassSubtypes(List<EClass> classList, EClass c  ) {
     ArrayList<EClass> subTypesList = new ArrayList<EClass>();  

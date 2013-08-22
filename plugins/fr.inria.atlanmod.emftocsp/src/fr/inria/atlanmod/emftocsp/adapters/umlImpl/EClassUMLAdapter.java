@@ -1,7 +1,6 @@
 package fr.inria.atlanmod.emftocsp.adapters.umlImpl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import fr.inria.emftocsp.adapters.EClassAdapter;
@@ -17,10 +16,9 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.BasicExtendedMetaData.EClassifierExtendedMetaData;
-import org.eclipse.emf.ecore.util.BasicExtendedMetaData.EClassifierExtendedMetaData.Holder;
 import org.eclipse.uml2.uml.Association;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Generalization;
@@ -29,18 +27,21 @@ import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.Property;
 
+import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EResourceUMLAdapter;
+
 public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifier{
 
 	protected Resource owningResource;
-	public EClassUMLAdapter(Class newClass) {
+	public EClassUMLAdapter(Class newClass, Resource owningResource) {
 		super(newClass);
+		this.owningResource = owningResource;
 		
 	}
 
 	@Override
 	public EPackage getEPackage() {
 		Assert.isNotNull(origClass.getPackage(),"NULL Package");
-		return new EPackageUMLAdapter(origClass.getPackage());
+		return new EPackageUMLAdapter(origClass.getPackage(),owningResource);
 	}
 
 
@@ -51,7 +52,16 @@ public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifie
 
 	@Override
 	public EObject eContainer() {
-		return origClass.eContainer();
+		if (origClass.eContainer() instanceof Package)
+			return new EPackageUMLAdapter((Package) origClass.eContainer(), owningResource);
+		else if (origClass.eContainer() instanceof Class )
+		return ((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassUMLAdapter((Class) origClass.eContainer(),owningResource));
+		try {
+			throw new Exception ("Unhandled Type : " + origClass.eContainer().eClass());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		 return origClass.eContainer();
 	}
 
 	@Override
@@ -59,17 +69,18 @@ public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifie
 		EList<EClass> result = new BasicEList<EClass>();
 			for (Generalization g : origClass.getGeneralizations() ){
 				if ((Class)g.getGeneral() != origClass) 
-					result.add(new EClassUMLAdapter((Class)g.getGeneral()));}
+					result.add((EClass)((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassUMLAdapter((Class)g.getGeneral(),owningResource)));}
 		return result ;
 	}
 
 	@Override
 	public EList<EClass> getEAllSuperTypes() {
+		//TODO
 		EList<EClass> result = new BasicEList<EClass>();
 		EList<Class> allSuperTypes = new BasicEList<Class>();
 		allSuperTypes(origClass,allSuperTypes);
 		for (Class cls : allSuperTypes)
-			result.add(new EClassUMLAdapter(cls));
+			result.add((EClass)((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassUMLAdapter(cls,owningResource)));
 	return result ;
 	}
 
@@ -84,18 +95,9 @@ public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifie
 	@Override
 	public EList<EAttribute> getEAttributes() {
 		EList<EAttribute> result = new BasicEList<EAttribute>();
-		List <Property> pros = origClass.getAttributes();
 			for (Property pro : origClass.getAttributes())
-				result.add(new EAttributeUMLAdapter(pro));
+				result.add(new EAttributeUMLAdapter(pro,owningResource));
 		return result;
-	}
-
-	@Override
-	public EList<EAttribute> getEAllAttributes() {
-		EList<EAttribute> result = new BasicEList<EAttribute>();
-		for (Property pro : origClass.getAllAttributes())
-			result.add(new EAttributeUMLAdapter(pro));
-	return result;
 	}
 
 	@Override
@@ -107,7 +109,7 @@ public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifie
 			for (Property pro : ass.getOwnedEnds()){
 				String msg = pro.getOtherEnd().getType() == null ? "NULL" : pro.getOtherEnd().getType().toString();
 				if (pro.getOtherEnd().getType().equals(origClass))
-					result.add(new EReferenceUMLAdapter(pro));
+					result.add(new EReferenceUMLAdapter(pro,owningResource));
 			}
 		}
 		return result;
@@ -130,24 +132,13 @@ public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifie
 		return result;
 	}
 
-	@Override
-	public EList<EReference> getEAllReferences() {
-		// TODO Implementing it if needed
-		return null;
-	}
-
-	@Override
-	public EList<EReference> getEAllContainments() {
-		// TODO implementing it if needed
-		return null;
-	}
 
 	@Override
 	public EList<EOperation> getEOperations() {
 		EList<EOperation> result = new BasicEList<EOperation>();
 			for (Operation operation : origClass.getOperations()){
 				if (operation != null)
-					result.add(new EOperationUMLAdapter(operation));}
+					result.add(new EOperationUMLAdapter(operation,owningResource));}
 		return result;
 	}
 
@@ -155,7 +146,7 @@ public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifie
 	public EList<EOperation> getEAllOperations() {
 		EList<EOperation> result = new BasicEList<EOperation>();
 		for (Operation operation : origClass.getAllOperations())
-			result.add(new EOperationUMLAdapter(operation));
+			result.add(new EOperationUMLAdapter(operation,owningResource));
 		return result;
 	}
 
@@ -163,13 +154,13 @@ public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifie
 	public EList<EAnnotation> getEAnnotations() {
 		EList<EAnnotation> result = new BasicEList<EAnnotation>();
 			for (EAnnotation annot : origClass.getEAnnotations())
-				result.add(new EAnnotationUMLAdapter(annot));
+				result.add(new EAnnotationUMLAdapter(annot,owningResource));
 		return result;
 	}
 
 	public EAnnotation getEAnnotation(String source) {
 		if (origClass.getEAnnotation(source) != null)
-			return new EAnnotationUMLAdapter(origClass.getEAnnotation(source));
+			return new EAnnotationUMLAdapter(origClass.getEAnnotation(source),owningResource);
 		return null;
 	}
 
@@ -183,5 +174,63 @@ public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifie
 		return EcorePackage.eINSTANCE.getEClass();
 	}
 
+	@Override
+	public EList<EStructuralFeature> getEStructuralFeatures() {
+		EList<EStructuralFeature> result = new BasicEList<EStructuralFeature>();
+		result.addAll(getEAttributes());
+		result.addAll(getEReferences());
+		return result;
+	}
 
+	@Override
+	public EList<EStructuralFeature> getEAllStructuralFeatures() {
+		EList<EStructuralFeature> result = new BasicEList<EStructuralFeature>();
+		result.addAll(getEStructuralFeatures());
+		for (EClass cls : getESuperTypes())
+			result.addAll(cls.getEAllStructuralFeatures());
+		return result;
+	}
+
+	@Override
+	public EList<EReference> getEAllReferences() {
+		EList<EReference> result = new BasicEList<EReference>();
+		result.addAll(getEReferences());
+		for (EClass cls : getESuperTypes())
+			result.addAll(cls.getEAllReferences());
+		return result;
+	}
+
+	@Override
+	public EList<EReference> getEAllContainments() {
+		EList<EReference> result = new BasicEList<EReference>();
+		for (EReference ref : getEAllReferences())
+			if (ref.isContainment())
+				result.add(ref);
+		return result;				
+	}
+
+	@Override
+	public EList<EAttribute> getEAllAttributes() {
+		EList<EAttribute> result = new BasicEList<EAttribute>();
+		result.addAll(getEAttributes());
+		for (EClass cls : getESuperTypes())
+			result.addAll(cls.getEAllAttributes());
+		return result;
+	}
+
+	@Override
+	public boolean isSuperTypeOf(EClass someClass) {
+		for (Generalization gen : origClass.getGeneralizations())
+			if (gen.getGeneral().getName().equalsIgnoreCase(origClass.getName()))				
+				if (((EResourceUMLAdapter)owningResource).
+						getClassIfNotExists(new EClassUMLAdapter((Class)gen
+								.getSpecific(),owningResource)).equals(someClass))
+					return true;							
+		return false;
+
+	}
+
+	public Class getOriginalClass() {
+		return origClass;
+	}
 }

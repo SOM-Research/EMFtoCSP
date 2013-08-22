@@ -67,6 +67,7 @@ public class WizardHandler extends AbstractWizardHandler {
 //		uriMap.put(URI.createURI(UMLResource.PROFILES_PATHMAP), modelUri.appendSegment("profiles").appendSegment(""));
 		UMLResource r = (UMLResource)rSet.getResource(modelUri, true);
 		EcoreUtil.resolveAll(r);	
+		UMLResourcesUtil.init(rSet);
 		return new EResourceUMLAdapter(r);
 	}
 

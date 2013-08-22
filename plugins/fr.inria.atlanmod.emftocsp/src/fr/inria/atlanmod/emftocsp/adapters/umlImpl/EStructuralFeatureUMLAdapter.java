@@ -9,6 +9,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.Classifier;
+import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Property;
 
 import fr.inria.emftocsp.adapters.EStructuralFeatureAdapter;
@@ -17,8 +18,9 @@ public class EStructuralFeatureUMLAdapter extends
 		EStructuralFeatureAdapter<Property> {
 
 	protected Resource owningResource;
-	public EStructuralFeatureUMLAdapter(Property newEStructFeat) {
+	public EStructuralFeatureUMLAdapter(Property newEStructFeat, Resource owningResource) {
 		super(newEStructFeat);
+		this.owningResource = owningResource;
 	}
 
 	@Override
@@ -38,7 +40,11 @@ public class EStructuralFeatureUMLAdapter extends
 
 	@Override
 	public EClassifier getEType() {
-		return new EClassifierUMLAdapter((Classifier)origEStructuralFeature.getType());
+		if (origEStructuralFeature.getType() instanceof Class) 
+			return (EClass) ((EResourceUMLAdapter)owningResource)
+					.getClassIfNotExists(new EClassUMLAdapter((Class)origEStructuralFeature.getType(), owningResource));
+		return ((EResourceUMLAdapter)owningResource)
+				.getClassIfNotExists(new EClassifierUMLAdapter((Classifier)origEStructuralFeature.getType(),owningResource));
 	}
 
 	@Override
@@ -50,13 +56,13 @@ public class EStructuralFeatureUMLAdapter extends
 	public EList<EAnnotation> getEAnnotations() {
 		EList<EAnnotation> result = new BasicEList<EAnnotation>();
 			for (EAnnotation annot : origEStructuralFeature.getEAnnotations())
-				result.add(new EAnnotationUMLAdapter(annot));
+				result.add(new EAnnotationUMLAdapter(annot,owningResource));
 		return result;
 	}
 
 	public EAnnotation getEAnnotation(String source) {
 		if (origEStructuralFeature.getEAnnotation(source) != null)
-			return new EAnnotationUMLAdapter(origEStructuralFeature.getEAnnotation(source));
+			return new EAnnotationUMLAdapter(origEStructuralFeature.getEAnnotation(source),owningResource);
 		return null;
 	}
 
@@ -72,7 +78,7 @@ public class EStructuralFeatureUMLAdapter extends
 
 	@Override
 	public EClass getEContainingClass() {
-		return new EClassUMLAdapter(origEStructuralFeature.getClass_());
+		return (EClass)((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassUMLAdapter(origEStructuralFeature.getClass_(),owningResource));
 	
 	}
 

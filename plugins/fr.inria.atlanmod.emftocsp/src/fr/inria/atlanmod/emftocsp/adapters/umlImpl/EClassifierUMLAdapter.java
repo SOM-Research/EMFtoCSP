@@ -5,15 +5,18 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.Classifier;
+import org.eclipse.uml2.uml.DataType;
 
 import fr.inria.emftocsp.adapters.EClassifierAdapter;
 
 public class EClassifierUMLAdapter extends EClassifierAdapter<Classifier> {
 
 	protected Resource owningResource;
-	public EClassifierUMLAdapter(Classifier newClassifier) {
+	public EClassifierUMLAdapter(Classifier newClassifier, Resource owningResource) {
 		super(newClassifier);
-		// TODO Auto-generated constructor stub
+		if (newClassifier instanceof DataType)
+			System.out.println("instanceOf EDataType");
+		this.owningResource = owningResource;
 	}
 
 	@Override
@@ -24,7 +27,7 @@ public class EClassifierUMLAdapter extends EClassifierAdapter<Classifier> {
 	@Override
 	public EPackage getEPackage() {
 		Assert.isNotNull(origClassifier.getPackage(),"NULL Package" );
-		return new EPackageUMLAdapter(origClassifier.getPackage());
+		return new EPackageUMLAdapter(origClassifier.getPackage(),owningResource);
 	}
 
 	@Override

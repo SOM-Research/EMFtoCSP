@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -233,7 +234,7 @@ public class ModelElementDomainPage extends WizardPage {
       for (EClass c : cList) {
         modelElementsDomain.put(c.getEPackage().getName() + "." + c.getName(), "0..5"); //$NON-NLS-1$ //$NON-NLS-2$
         List<EAttribute> atList = modelReader.getClassAttributes(c);
-        for (EAttribute at : atList){
+        for (EAttribute at : atList){ 
         	String name = at.getEAttributeType().getName();
           if (at.getEAttributeType().getName().equalsIgnoreCase("boolean") || at.getEAttributeType().getName().equalsIgnoreCase("boolean")  ) //$NON-NLS-1$
             modelElementsDomain.put(at.getEContainingClass().getName() + "." + at.getName(), "0..1"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -21,6 +21,32 @@ import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EClassifierUMLAdapter;
 
 public abstract class EParameterAdapter<P> implements EParameter {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((origParameter == null) ? 0 : origParameter.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EParameterAdapter))
+			return false;
+		@SuppressWarnings("rawtypes")
+		EParameterAdapter other = (EParameterAdapter) obj;
+		if (origParameter == null) {
+			if (other.origParameter != null)
+				return false;
+		} else if (!origParameter.equals(other.origParameter))
+			return false;
+		return true;
+	}
+
 	protected P origParameter;
 	
 	public EParameterAdapter(P newParameter){

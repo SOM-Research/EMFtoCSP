@@ -3,7 +3,6 @@
  */
 package fr.inria.atlanmod.emftocsp.emf.impl;
 
-import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +39,7 @@ import fr.inria.atlanmod.emftocsp.impl.ModelBuilder;
 import fr.inria.atlanmod.emftocsp.modelbuilder.AssocStruct;
 import fr.inria.atlanmod.emftocsp.modelbuilder.Field;
 import fr.inria.atlanmod.emftocsp.modelbuilder.ObjectStruct;
+import fr.inria.atlanmod.emftocsp.modelbuilder.Point;
 
 /**
  * @author abenelal
@@ -50,13 +50,10 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 	/**
 	 * 
 	 */
-	private Map <Point,EObject> idToObj = new HashMap<Point,EObject>(); 
-	private EList<EObject> objList = new BasicEList<EObject>(); 
+	protected Map <Point,EObject> idToObj = new HashMap<Point,EObject>(); 
+	protected EList<EObject> objList = new BasicEList<EObject>(); 
 	public EmfModelBuilder() {
 		
-		
-
-		// TODO Auto-generated constructor stub
 	}
 	public EmfModelBuilder(IModelReader<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation> modelReader, CompoundTerm ct){		
 		solution = ct;
@@ -84,7 +81,7 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 		
 		setupEReferences();
 		
-		Map options = new HashMap();
+		Map<String, Boolean> options = new HashMap<String, Boolean>();
 		
 		options.put(XMLResource.OPTION_SCHEMA_LOCATION, Boolean.TRUE);
 		options.put(XMLResource.OPTION_USE_ENCODED_ATTRIBUTE_STYLE, Boolean.TRUE);
@@ -97,14 +94,14 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 
 	}
 
-	private void serializeInstance(String fileName, Map options) {
+	private void serializeInstance(String fileName, Map<String, Boolean> options) {
 		ResourceSet rscSet = new ResourceSetImpl();
 		EPackage topPck= (EPackage) modelReader.getResource().getContents().get(0);
 		
 		rscSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put(
 				"xmi", new  XMLResourceFactoryImpl());
 		EPackage.Registry.INSTANCE.put(topPck.getNsURI(), topPck);
-		
+		fileName+=".xmi";
 		Resource resource = rscSet.createResource(URI.createURI(fileName));
 		Iterator<EObject> objIt = objList.iterator();
 		while (objIt.hasNext()) {
@@ -132,15 +129,7 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 			EObject srcObj = idToObj.get(new Point(mostInnerSrcClsId ,assStruct.getSrcOid()));
 			EObject trgObj = idToObj.get(new Point(mostInnerTrgClsId ,assStruct.getTrgOid()));
 			if (ref.isMany())
-//			if (ref.isContainment())	
-				// TODO check if its the same for non containment associations 
 				((EList<EObject>)srcObj.eGet(ref)).add(trgObj);
-//			else if (ref.isMany()){
-//				EList<EObject> list = (EList<EObject>) srcObj.eGet(ref);
-//				list.add(trgObj);
-//				srcObj.eSet(ref,list);
-//				System.out.println("");
-//			}
 			else
 				srcObj.eSet(ref,trgObj);
 
@@ -164,14 +153,12 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 			int objOid = (Integer) struct.getOid();
 			idToObj.put(new Point(associatedClass.getClassifierID(),objOid), obj);
 			List<EAttribute> attList = associatedClass.getEAllAttributes();
-			
 			if (attList.size() != 0){
 				for (int i=1; i<= attList.size();i++){
 					Field field = struct.getFields().get(i);
 					Object value = null;
 					String stringType = attList.get(i-1).getEType().getName();
-					System.out.println(stringType);
-					
+					System.out.println(stringType);				
 					if (stringType.equals("EString") 
 							|| attList.get(i-1).getEType().getName().contains("EChar"))
 						value = " ";
@@ -200,8 +187,7 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 	}
 	@Override
 	public boolean solutionIsEmpty() {
-			objectStructures.isEmpty();
-		return false;
+			return objectStructures.isEmpty();
 	}
 	private int getMostConcreteClsId(EClass cls,int srcOid) {
 		List<EClass> subTypes = new ArrayList<EClass>();
@@ -214,7 +200,7 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 				return idToObj.get(point).eClass().getClassifierID();}
 		return -1;
 	}
-	private void reconstruct(ObjectStruct struct) {
+	protected void reconstruct(ObjectStruct struct) {
 		List<Field> newFields = new ArrayList<Field>();
 		newFields.add(struct.getFields().get(0));
 		List<ObjectStruct> listStructs = sortedSuperStructs(struct);
@@ -226,7 +212,7 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 		struct.getFields().addAll(newFields);
 		
 	}
-	private List<ObjectStruct> sortedSuperStructs(ObjectStruct struct) {
+	protected List<ObjectStruct> sortedSuperStructs(ObjectStruct struct) {
 		List<ObjectStruct> listObj = new ArrayList<ObjectStruct>();
 		listObj = getSuperStructures(struct);
 		sortByMostAbstract(listObj);
@@ -239,19 +225,17 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 				if (!abstractThan(listObj.get(i),listObj.get(j))){
 					ObjectStruct tmp = listObj.get(i);
 					listObj.set(i, listObj.get(j));
-					listObj.set(j, tmp);
-					
-					
+					listObj.set(j, tmp);				
 							}
 			}
 		
 		
 	}
-	private boolean abstractThan(ObjectStruct objectStruct,
+	protected boolean abstractThan(ObjectStruct objectStruct,
 			ObjectStruct objectStruct2) {		
 		return getSuperStructures(objectStruct2).contains(objectStruct);
 	}
-	private List<ObjectStruct> getSuperStructures(ObjectStruct struct) {
+	protected List<ObjectStruct> getSuperStructures(ObjectStruct struct) {
 		List<ObjectStruct> listObj = new ArrayList<ObjectStruct>();
 		EClass cls =getEClassFromObj(struct.getName());
 		EList<EClass> listCls= cls.getEAllSuperTypes();
@@ -264,23 +248,22 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 		
 		return listObj;
 	}
-	private boolean existsOidInSubtypes(List<EClass> subtypes, int oid) {
+	protected boolean existsOidInSubtypes(List<EClass> subtypes, int oid) {
 		if (subtypes==null)
 			return false;
 		for (EClass cls : subtypes){
 			String strCls = cls.getName().toLowerCase();		
 			for (ObjectStruct objStr : objectStructures )
 				if (objStr.getName().equals(strCls) && objStr.getOid()==oid)
-					return true;
-				
+					return true;			
 			}
 				
 		return false;
 	}
-	private boolean isRoot(EObject obj) {
+	protected boolean isRoot(EObject obj) {
 		return obj.eContainer()==null ? true : obj.eContainingFeature().getFeatureID()==-1;
 	}
-	private EReference getEReferenceFromAssoc(String name) {
+	protected EReference getEReferenceFromAssoc(String name) {
 		for ( Iterator<EAssociation> it = modelReader.getAssociations().iterator(); it.hasNext();){
 			EAssociation ass = it.next();
 			if (ass.getName().toLowerCase().equals(name))
@@ -288,7 +271,7 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 		}
 		return null;
 	}
-	private EClass getEClassFromObj(String str) {
+	protected EClass getEClassFromObj(String str) {
 		for (Iterator<EClass> it = modelReader.getClasses().iterator();it.hasNext();)
 		{
 			EClass cls = it.next();
@@ -301,14 +284,15 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 	public void decorticateResult() {
 		assocStructures = new ArrayList<AssocStruct>();
 		objectStructures = new ArrayList<ObjectStruct>();
-		@SuppressWarnings("unchecked")
 		CompoundTerm term = (CompoundTerm) solution.arg(1);
 		if (!(term.arg(1) == Collections.EMPTY_LIST  ) ){
-		List rangesList=(List)term.arg(1);
+		@SuppressWarnings("unchecked")
+		List<LinkedList<CompoundTerm>> rangesList=(List<LinkedList<CompoundTerm>>)term.arg(1);
 			for (Iterator<LinkedList<CompoundTerm>> iter=rangesList.iterator(); iter.hasNext();)
 			{
 				Object intermediate = iter.next() ;
 				if (intermediate != Collections.EMPTY_LIST  ){
+				@SuppressWarnings("unchecked")
 				LinkedList<CompoundTerm> cpList = (LinkedList<CompoundTerm>) intermediate;
 					for (Iterator<CompoundTerm> iterL2 = cpList.iterator(); iterL2.hasNext();)
 					{

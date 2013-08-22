@@ -18,6 +18,31 @@ import org.eclipse.emf.ecore.resource.Resource;
 
 public abstract class EAnnotationAdapter<A> implements EAnnotation {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((origEAnnotation == null) ? 0 : origEAnnotation.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EAnnotationAdapter))
+			return false;
+		EAnnotationAdapter other = (EAnnotationAdapter) obj;
+		if (origEAnnotation == null) {
+			if (other.origEAnnotation != null)
+				return false;
+		} else if (!origEAnnotation.equals(other.origEAnnotation))
+			return false;
+		return true;
+	}
+
 	protected A origEAnnotation;
 	
 	public EAnnotationAdapter(A newEAnnotation){

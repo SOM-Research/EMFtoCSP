@@ -1,5 +1,6 @@
 package fr.inria.emftocsp.adapters;
 
+import java.awt.PageAttributes.OriginType;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -20,6 +21,32 @@ import org.eclipse.emf.ecore.util.BasicExtendedMetaData.EStructuralFeatureExtend
 
 public abstract class EStructuralFeatureAdapter<ES> implements EStructuralFeature, Holder {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((origEStructuralFeature == null) ? 0
+						: origEStructuralFeature.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EStructuralFeatureAdapter))
+			return false;
+		EStructuralFeatureAdapter other = (EStructuralFeatureAdapter) obj;
+		if (origEStructuralFeature == null) {
+			if (other.origEStructuralFeature != null)
+				return false;
+		} else if (!origEStructuralFeature.equals(other.origEStructuralFeature))
+			return false;
+		return true;
+	}
 	protected ES origEStructuralFeature;
 	
 	public EStructuralFeatureAdapter ( ES newEStructFeat) {		
@@ -298,4 +325,7 @@ public abstract class EStructuralFeatureAdapter<ES> implements EStructuralFeatur
 		
 	}
 
+	public ES getOriginalFeature(){
+		return origEStructuralFeature;
+	}
 }

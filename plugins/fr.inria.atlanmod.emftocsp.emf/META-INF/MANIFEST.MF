@@ -11,7 +11,8 @@ Require-Bundle: fr.inria.atlanmod.emftocsp;bundle-version="1.0.0",
  org.eclipse.core.runtime;bundle-version="3.6.0",
  org.eclipse.ocl.ecore;bundle-version="3.0.0",
  org.eclipse.uml2.uml,
- fr.inria.atlanmod.emftocsp.uml
+ fr.inria.atlanmod.emftocsp.uml,
+ org.eclipse.uml2.uml.resources
 Export-Package: fr.inria.atlanmod.emftocsp.emf,
  fr.inria.atlanmod.emftocsp.emf.impl
 Bundle-Vendor: %Bundle-Vendor

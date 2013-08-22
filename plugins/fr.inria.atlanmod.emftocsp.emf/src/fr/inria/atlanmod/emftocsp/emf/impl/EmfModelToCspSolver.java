@@ -23,6 +23,7 @@ import fr.inria.atlanmod.emftocsp.ICspCodeGenerator;
 import fr.inria.atlanmod.emftocsp.IModelBuilder;
 import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IOclParser;
+import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EResourceUMLAdapter;
 import fr.inria.atlanmod.emftocsp.impl.ModelToCspSolver;
 
 /**
@@ -66,6 +67,9 @@ public class EmfModelToCspSolver extends ModelToCspSolver<Resource,CompoundTerm>
 	  if (emfModelResource == null)
 	      return null;
 	    if (builder == null)
+	    	if (emfModelResource instanceof EResourceUMLAdapter)
+	    		builder = new UmlModelBuilder(getModelReader());
+	    	else	
 	      builder = new EmfModelBuilder(getModelReader());
   	return (IModelBuilder<Resource, EPackage, EClass, EAssociation, EAttribute, EOperation, CompoundTerm>) builder;
   }

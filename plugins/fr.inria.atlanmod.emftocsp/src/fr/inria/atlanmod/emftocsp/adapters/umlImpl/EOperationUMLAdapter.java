@@ -10,30 +10,32 @@ import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EParameter;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.Classifier;
+import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Operation;
 import org.eclipse.uml2.uml.Parameter;
+import org.eclipse.uml2.uml.ParameterDirectionKind;
 
 import fr.inria.emftocsp.adapters.EOperationAdapter;
 
 public class EOperationUMLAdapter extends EOperationAdapter<Operation> {
 
 	protected Resource owningResource;
-	public EOperationUMLAdapter(Operation newOperation) {
+	public EOperationUMLAdapter(Operation newOperation, Resource owningResource) {
 		super(newOperation);
-		// TODO Auto-generated constructor stub
+		this.owningResource = owningResource;
 	}
 
 	@Override
 	public EList<EAnnotation> getEAnnotations() {
 		EList<EAnnotation> result = new BasicEList<EAnnotation>();
 			for (EAnnotation annot : origOperation.getEAnnotations())
-				result.add(new EAnnotationUMLAdapter(annot));
+				result.add(new EAnnotationUMLAdapter(annot,owningResource));
 		return result;
 	}
 
 	@Override
 	public EAnnotation getEAnnotation(String source) {
-		return new EAnnotationUMLAdapter(origOperation.getEAnnotation(source));
+		return new EAnnotationUMLAdapter(origOperation.getEAnnotation(source),owningResource);
 	}
 
 	@Override
@@ -43,7 +45,8 @@ public class EOperationUMLAdapter extends EOperationAdapter<Operation> {
 
 	@Override
 	public EClass getEContainingClass() {
-		return new EClassUMLAdapter(origOperation.getClass_());
+		//TODO
+		return (EClass)((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassUMLAdapter(origOperation.getClass_(),owningResource));
 	}
 
 	@Override
@@ -52,14 +55,17 @@ public class EOperationUMLAdapter extends EOperationAdapter<Operation> {
 		EList<EParameter> result = new BasicEList<EParameter>();
 	    if (! paramList.isEmpty()){
 	    	for (Parameter param : paramList)
-	    		result.add(new EParameterUMLAdapter(param));
+	    		 if (param.getDirection() != ParameterDirectionKind.RETURN_LITERAL)
+	    		result.add(((EResourceUMLAdapter)owningResource).getParamIfNotExists(new EParameterUMLAdapter(param,owningResource)));
 	    }
 	return result;
 	}
 
 	@Override
 	public EClassifier getEType() {
-		return new EClassifierUMLAdapter((Classifier) origOperation.getType());
+		if (origOperation.getType() instanceof Class ) 
+			return ((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassUMLAdapter((Class)origOperation.getType(),owningResource));
+		return ((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassifierUMLAdapter((Classifier) origOperation.getType(),owningResource));
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -17,13 +18,14 @@ import fr.inria.emftocsp.adapters.EReferenceAdapter;
 public class EReferenceUMLAdapter extends EReferenceAdapter<Property> implements EStructuralFeature {
 
 	protected Resource owningResource;
-	public EReferenceUMLAdapter(Property newResource) {
+	public EReferenceUMLAdapter(Property newResource, Resource owningResource) {
 		super(newResource);
+		this.owningResource = owningResource;
 	}
 
 	@Override
-	public EClass getEContainingClass() {
-		return new EClassUMLAdapter(origEReference.getClass_());
+	public EClass getEContainingClass() {	
+			return (EClass) getEOpposite().getEType();
 	}
 
 	@Override
@@ -42,8 +44,9 @@ public class EReferenceUMLAdapter extends EReferenceAdapter<Property> implements
 	}
 
 	@Override
-	public EClass getEType() {
-		return new EClassUMLAdapter((Class)origEReference.getType());
+	public EClassifier getEType() {
+		//TODO
+		return (EClass) ((EResourceUMLAdapter)owningResource).getClassIfNotExists( new EClassUMLAdapter((Class)origEReference.getType(),owningResource));
 	}
 
 	@Override
@@ -55,13 +58,13 @@ public class EReferenceUMLAdapter extends EReferenceAdapter<Property> implements
 	public EList<EAnnotation> getEAnnotations() {
 		EList<EAnnotation> result = new BasicEList<EAnnotation>();
 			for (EAnnotation annot : origEReference.getEAnnotations())
-				result.add(new EAnnotationUMLAdapter(annot));
+				result.add(new EAnnotationUMLAdapter(annot,owningResource));
 		return result;
 	}
 
 	public EAnnotation getEAnnotation(String source) {
 		if (origEReference.getEAnnotation(source) != null)
-			return new EAnnotationUMLAdapter(origEReference.getEAnnotation(source));
+			return new EAnnotationUMLAdapter(origEReference.getEAnnotation(source),owningResource);
 		return null;
 	}
 
@@ -72,7 +75,7 @@ public class EReferenceUMLAdapter extends EReferenceAdapter<Property> implements
 
 	@Override
 	public boolean isContainment() {
-		return origEReference.getOtherEnd().getAggregation().getLiteral().equals(AggregationKind.COMPOSITE_LITERAL.getLiteral());
+		return origEReference.getAggregation().getLiteral().equals(AggregationKind.COMPOSITE_LITERAL.getLiteral());
 	}
 
 	@Override
@@ -83,14 +86,30 @@ public class EReferenceUMLAdapter extends EReferenceAdapter<Property> implements
 
 	@Override
 	public EReference getEOpposite() {
+		Property otherEnd = origEReference.getOtherEnd();
 		if (origEReference.getOtherEnd()!= null )
-			return new EReferenceUMLAdapter(origEReference.getOtherEnd());
+			return new EReferenceUMLAdapter(origEReference.getOtherEnd(),owningResource);
 		return null;
 	}
 
 	@Override
 	public EClass getEReferenceType() {
-		return new EClassUMLAdapter((Class)origEReference.getType());
+		return (EClass)((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassUMLAdapter((Class)origEReference.getType(),owningResource));
+	}
+
+	@Override
+	public boolean isOrdered() {
+		return origEReference.isOrdered();
+	}
+
+	@Override
+	public boolean isUnique() {
+		return origEReference.isUnique();
+	}
+
+	@Override
+	public boolean isRequired() {
+		return isRequired();
 	}
 
 

@@ -22,6 +22,30 @@ import org.eclipse.emf.ecore.util.BasicExtendedMetaData.EStructuralFeatureExtend
 
 public abstract class EAttributeAdapter<A> implements EAttribute, Holder {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((origAttribute == null) ? 0 : origAttribute.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EAttributeAdapter))
+			return false;
+		EAttributeAdapter other = (EAttributeAdapter) obj;
+		if (origAttribute == null) {
+			if (other.origAttribute != null)
+				return false;
+		} else if (!origAttribute.equals(other.origAttribute))
+			return false;
+		return true;
+	}
 	protected A origAttribute;
 	
 	public EAttributeAdapter(A newAttribute){
@@ -199,10 +223,7 @@ public abstract class EAttributeAdapter<A> implements EAttribute, Holder {
 	}
 
 	@Override
-	public EObject eContainer() {
-		throw new UnsupportedOperationException();	
-	}
-
+	public abstract EObject eContainer();
 	@Override
 	public EStructuralFeature eContainingFeature() {
 		throw new UnsupportedOperationException();	
@@ -319,5 +340,8 @@ public abstract class EAttributeAdapter<A> implements EAttribute, Holder {
 		
 	}
 
+	public A getOriginalAttribute(){
+		return origAttribute;
+	}
 }
 

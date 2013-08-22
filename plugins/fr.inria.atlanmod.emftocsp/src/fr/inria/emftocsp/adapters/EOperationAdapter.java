@@ -22,6 +22,31 @@ import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EClassUMLAdapter;
 
 public abstract class EOperationAdapter<O> implements EOperation {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((origOperation == null) ? 0 : origOperation.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EOperationAdapter))
+			return false;
+		EOperationAdapter other = (EOperationAdapter) obj;
+		if (origOperation == null) {
+			if (other.origOperation != null)
+				return false;
+		} else if (!origOperation.equals(other.origOperation))
+			return false;
+		return true;
+	}
+
 	protected O origOperation;
 	
 	public EOperationAdapter(O newOperation){

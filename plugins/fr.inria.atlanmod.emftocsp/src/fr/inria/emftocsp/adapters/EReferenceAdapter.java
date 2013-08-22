@@ -21,6 +21,30 @@ import org.eclipse.emf.ecore.util.BasicExtendedMetaData.EStructuralFeatureExtend
 
 public abstract class EReferenceAdapter<ER> implements EReference, Holder{
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((origEReference == null) ? 0 : origEReference.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EReferenceAdapter))
+			return false;
+		EReferenceAdapter other = (EReferenceAdapter) obj;
+		if (origEReference == null) {
+			if (other.origEReference != null)
+				return false;
+		} else if (!origEReference.equals(other.origEReference))
+			return false;
+		return true;
+	}
 	protected ER origEReference;
 	
 	public EReferenceAdapter (ER newEReference){
@@ -117,9 +141,7 @@ public abstract class EReferenceAdapter<ER> implements EReference, Holder{
 	}
 
 	@Override
-	public boolean isOrdered() {
-		throw new UnsupportedOperationException();
-	}
+	public abstract boolean isOrdered();
 
 	@Override
 	public void setOrdered(boolean value) {
@@ -128,9 +150,7 @@ public abstract class EReferenceAdapter<ER> implements EReference, Holder{
 	}
 
 	@Override
-	public boolean isUnique() {
-		throw new UnsupportedOperationException();
-	}
+	public abstract boolean isUnique();
 
 	@Override
 	public void setUnique(boolean value) {
@@ -159,9 +179,7 @@ public abstract class EReferenceAdapter<ER> implements EReference, Holder{
 	public abstract boolean isMany();
 
 	@Override
-	public boolean isRequired() {
-		throw new UnsupportedOperationException();
-	}
+	public abstract boolean isRequired();
 
 	@Override
 	public abstract EClassifier getEType();
@@ -344,4 +362,7 @@ public abstract class EReferenceAdapter<ER> implements EReference, Holder{
 		
 	}
 
+	public ER getOriginalReference(){
+		return origEReference;
+	}
 }

@@ -58,6 +58,7 @@ public abstract class EClassAdapter<C> implements EClass, Holder {
 	protected C origClass;
 	
 	public EClassAdapter (C newClass){
+		if (newClass == null) throw new NullPointerException("original class is null");
 		origClass = newClass;
 	}
 	@Override
@@ -291,12 +292,10 @@ public abstract class EClassAdapter<C> implements EClass, Holder {
 
 	@Override
 	public abstract EList<EOperation> getEAllOperations() ;
-
+	
 	@Override
-	public boolean isSuperTypeOf(EClass someClass) {
-		throw new UnsupportedOperationException(); 
-	}
-
+	public abstract boolean isSuperTypeOf(EClass someClass);
+	
 	@Override
 	public int getFeatureCount() {
 		throw new UnsupportedOperationException(); 
@@ -342,13 +341,9 @@ public abstract class EClassAdapter<C> implements EClass, Holder {
 		throw new UnsupportedOperationException(); 
 	}
 	@Override
-	public EList<EStructuralFeature> getEStructuralFeatures() {
-		throw new UnsupportedOperationException(); 
-	}
+	public abstract EList<EStructuralFeature> getEStructuralFeatures();
 	@Override
-	public EList<EStructuralFeature> getEAllStructuralFeatures() {
-		throw new UnsupportedOperationException(); 
-	}
+	public abstract EList<EStructuralFeature> getEAllStructuralFeatures();
 	@Override
 	public void setExtendedMetaData(
 			EClassifierExtendedMetaData eClassifierExtendedMetaData) {
@@ -361,4 +356,7 @@ public abstract class EClassAdapter<C> implements EClass, Holder {
 		return null;
 	}
 
+	public C getOriginalClass(){
+		return origClass;
+	}
 }

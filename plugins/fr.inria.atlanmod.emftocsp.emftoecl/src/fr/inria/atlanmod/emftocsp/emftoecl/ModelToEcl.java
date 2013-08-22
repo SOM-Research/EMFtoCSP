@@ -752,7 +752,7 @@ protected String genCardinalityInstantiationSection() {
       List<EAttribute> atList = emfModelReader.getClassAttributes(c);
       List<EAttribute> atListNumeric = new ArrayList<EAttribute>();
       for (EAttribute at : atList) { 
-    	  if (! (at.getEAttributeType().getName().equalsIgnoreCase("string") || at.getEAttributeType().getName().equalsIgnoreCase("string")) ) {
+    	  if (! (at.getEAttributeType().getName().equalsIgnoreCase("string") || at.getEAttributeType().getName().equalsIgnoreCase("estring")) ) {
     		  atListNumeric.add(at);
     	  }
       }

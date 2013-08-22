@@ -5,16 +5,21 @@ import fr.inria.emftocsp.adapters.EAnnotationAdapter;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.Classifier;
+import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Operation;
 import org.eclipse.uml2.uml.Property;
 public class EAnnotationUMLAdapter extends EAnnotationAdapter<EAnnotation> {
 
-	public EAnnotationUMLAdapter(EAnnotation newEAnnotation) {
+	protected Resource owningResource;
+	
+	public EAnnotationUMLAdapter(EAnnotation newEAnnotation, Resource owningResource) {
 		super(newEAnnotation);
-		// TODO Auto-generated constructor stub
+		this.owningResource = owningResource;
 	}
 
+	
 	@Override
 	public String getSource() {
 		return origEAnnotation.getSource();
@@ -30,11 +35,12 @@ public class EAnnotationUMLAdapter extends EAnnotationAdapter<EAnnotation> {
 		
 		EModelElement element = origEAnnotation.getEModelElement();
 			if (element instanceof Operation)
-				return (new EOperationUMLAdapter((Operation) element));
+				return new EOperationUMLAdapter((Operation) element,owningResource);
 			if (element instanceof Classifier)
-				return new EClassifierUMLAdapter((Classifier)element);
+				if (element instanceof Class) return ((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassUMLAdapter((Class)element,owningResource));
+				else return ((EResourceUMLAdapter)owningResource).getClassIfNotExists(new EClassifierUMLAdapter((Classifier)element,owningResource));
 			if (element instanceof Property)
-				return new EStructuralFeatureUMLAdapter((Property)element);
+				return new EStructuralFeatureUMLAdapter((Property)element,owningResource);
 		return origEAnnotation.getEModelElement();
 	}
 

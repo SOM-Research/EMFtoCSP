@@ -21,6 +21,32 @@ import org.eclipse.emf.ecore.util.BasicExtendedMetaData.EPackageExtendedMetaData
 
 public abstract class EPackageAdapter<P> implements EPackage, Holder {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((origPackage == null) ? 0 : origPackage.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EPackageAdapter))
+			return false;
+		EPackageAdapter<?> other = (EPackageAdapter<?>) obj;
+		if (origPackage == null) {
+			if (other.origPackage != null)
+				return false;
+		} else if (!origPackage.equals(other.origPackage))
+			return false;
+		return true;
+	}
+
 	protected P origPackage;
 	
 	public EPackageAdapter (P newPackage){
@@ -51,9 +77,7 @@ public abstract class EPackageAdapter<P> implements EPackage, Holder {
 	public abstract Resource eResource();
 
 	@Override
-	public EObject eContainer() {
-		throw new UnsupportedOperationException();	
-	}
+	public abstract EObject eContainer();
 
 	@Override
 	public EStructuralFeature eContainingFeature() {
@@ -161,9 +185,8 @@ public abstract class EPackageAdapter<P> implements EPackage, Holder {
 	}
 
 	@Override
-	public EFactory getEFactoryInstance() {
-		throw new UnsupportedOperationException();
-	}
+	public abstract  EFactory getEFactoryInstance();
+	
 
 	@Override
 	public void setEFactoryInstance(EFactory value) {
@@ -190,6 +213,9 @@ public abstract class EPackageAdapter<P> implements EPackage, Holder {
 	public EPackageExtendedMetaData getExtendedMetaData() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	public P getOriginalPackage(){
+		return origPackage;
 	}
 
 }

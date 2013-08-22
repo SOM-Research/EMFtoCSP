@@ -23,6 +23,32 @@ import org.eclipse.uml2.uml.DataType;
 
 public  abstract class EClassifierAdapter <EC> implements EClassifier, Holder{
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((origClassifier == null) ? 0 : origClassifier.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EClassifierAdapter))
+			return false;
+		EClassifierAdapter other = (EClassifierAdapter) obj;
+		if (origClassifier == null) {
+			if (other.origClassifier != null)
+				return false;
+		} else if (!origClassifier.equals(other.origClassifier))
+			return false;
+		return true;
+	}
+
 	protected EC origClassifier;
 	
 	public EClassifierAdapter (EC newClassifier) {
