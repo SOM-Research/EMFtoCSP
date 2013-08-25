@@ -12,7 +12,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Property;
 
-import fr.inria.emftocsp.adapters.EAttributeAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.EAttributeAdapter;
 public class EAttributeUMLAdapter extends EAttributeAdapter<Property> implements EStructuralFeature{
 
 	protected Resource owningResource;

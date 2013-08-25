@@ -96,9 +96,9 @@ public class EmfToEclCodeGenerator extends EmfCspCodeGenerator {
       s.append("\n");
       s.append(emfTranslator.genInstancesSection2());
       s.append("\n");
-      s.append(emfTranslator.genAttributeLabelingSection());
-      s.append("\n");
       s.append(emfTranslator.genOclRootSection());
+      s.append("\n");
+      s.append(emfTranslator.genAttributeLabelingSection());
       s.append("\n");
       s.append(emfTranslator.genStringLabelingSection());
       s.append("\n");

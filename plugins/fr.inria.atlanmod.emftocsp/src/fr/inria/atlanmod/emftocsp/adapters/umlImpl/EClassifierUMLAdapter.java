@@ -7,7 +7,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.Classifier;
 import org.eclipse.uml2.uml.DataType;
 
-import fr.inria.emftocsp.adapters.EClassifierAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.EClassifierAdapter;
 
 public class EClassifierUMLAdapter extends EClassifierAdapter<Classifier> {
 

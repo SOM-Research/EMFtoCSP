@@ -15,7 +15,7 @@ import org.eclipse.uml2.uml.Operation;
 import org.eclipse.uml2.uml.Parameter;
 import org.eclipse.uml2.uml.ParameterDirectionKind;
 
-import fr.inria.emftocsp.adapters.EOperationAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.EOperationAdapter;
 
 public class EOperationUMLAdapter extends EOperationAdapter<Operation> {
 

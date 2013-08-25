@@ -10,6 +10,9 @@
  *******************************************************************************/
 package fr.inria.atlanmod.emftocsp.emf.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EOperation;
@@ -25,6 +28,7 @@ import fr.inria.atlanmod.emftocsp.IModelReader;
 import fr.inria.atlanmod.emftocsp.IOclParser;
 import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EResourceUMLAdapter;
 import fr.inria.atlanmod.emftocsp.impl.ModelToCspSolver;
+import fr.inria.atlanmod.emftocsp.modelbuilder.Point;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
@@ -98,6 +102,8 @@ public void setBuilder(
 	this.builder = builder;
 	
 }
+
+
 
 
 

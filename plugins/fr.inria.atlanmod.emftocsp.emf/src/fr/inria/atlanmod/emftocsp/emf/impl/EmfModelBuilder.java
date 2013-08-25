@@ -88,10 +88,6 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 		options.put(XMLResource.OPTION_KEEP_DEFAULT_CONTENT, true);
 		
 		serializeInstance(fileName,options);
-		
-
-		
-
 	}
 
 	private void serializeInstance(String fileName, Map<String, Boolean> options) {
@@ -125,7 +121,7 @@ public class EmfModelBuilder extends ModelBuilder<Resource, EPackage, EClass, EA
 			EClass srcCls = ref.getEContainingClass();
 			EClass trgCls = ref.getEReferenceType();
 			int mostInnerSrcClsId = getMostConcreteClsId(srcCls,assStruct.getSrcOid());
-			int mostInnerTrgClsId = getMostConcreteClsId(trgCls,assStruct.getSrcOid());
+			int mostInnerTrgClsId = getMostConcreteClsId(trgCls,assStruct.getTrgOid());
 			EObject srcObj = idToObj.get(new Point(mostInnerSrcClsId ,assStruct.getSrcOid()));
 			EObject trgObj = idToObj.get(new Point(mostInnerTrgClsId ,assStruct.getTrgOid()));
 			if (ref.isMany())

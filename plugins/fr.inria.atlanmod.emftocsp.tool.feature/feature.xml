@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="fr.inria.atlanmod.emftocsp.tool.feature"
+      label="EMFToCSP tool"
+      version="1.1.1.qualifier"
+      provider-name="INRIA AtlanMod Research Team">
+
+   <description url="http://code.google.com/a/eclipselabs.org/p/emftocsp/">
+      EMFToCSP is a tool for the automatic verification of UML and
+EMF models, 
+annotated with OCL constraints. It can check automatically several
+correctness 
+properties such as the satisfiability of the model or the lack
+of contradictory constraints
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.common"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.uml2.uml"/>
+      <import plugin="org.eclipse.ocl"/>
+      <import plugin="fr.inria.atlanmod.emftocsp" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="fr.inria.atlanmod.emftocsp.eclipsecs.libs" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ocl.ecore" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.uml2.uml.resources"/>
+      <import plugin="fr.inria.atlanmod.emftocsp.emf" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.commands"/>
+      <import plugin="org.eclipse.equinox.common"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.uml2.uml.resources" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="fr.inria.atlanmod.emftocsp.emftoecl" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="fr.inria.atlanmod.emftocsp.eclipsecs" version="1.0.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="fr.inria.atlanmod.emftocsp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.inria.atlanmod.emftocsp.eclipsecs"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.inria.atlanmod.emftocsp.eclipsecs.libs"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.inria.atlanmod.emftocsp.emf"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.inria.atlanmod.emftocsp.emftoecl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.inria.atlanmod.emftocsp.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.inria.atlanmod.emftocsp.ui.main"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

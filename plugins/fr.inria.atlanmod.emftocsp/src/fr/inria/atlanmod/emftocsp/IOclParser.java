@@ -11,8 +11,13 @@
 package fr.inria.atlanmod.emftocsp;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.resource.Resource;
+
+import fr.inria.atlanmod.emftocsp.modelbuilder.Point;
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
@@ -31,5 +36,12 @@ public interface IOclParser<CT, R> {
   List<String> getModelConstraintsNames(R modelResource, IFile oclDocument) throws ProcessingException;
 
   List<String> getModelInvariantNames(R modelResource, IFile oclDocument) throws ProcessingException;
+
+//  List<Point> getConcernedAttributes(Resource resource, IFile iFile);
+//
+//Map<EClass, Point> getConcernedClasses(Resource model, IFile constraintsDocument);
+  
+  
+
   
 }

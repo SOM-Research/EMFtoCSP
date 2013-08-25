@@ -3,7 +3,6 @@ package fr.inria.atlanmod.emftocsp.adapters.umlImpl;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.emftocsp.adapters.EClassAdapter;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.emf.common.util.BasicEList;
@@ -27,6 +26,7 @@ import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.Property;
 
+import fr.inria.atlanmod.emftocsp.adapters.EClassAdapter;
 import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EResourceUMLAdapter;
 
 public class EClassUMLAdapter extends EClassAdapter<Class> implements EClassifier{

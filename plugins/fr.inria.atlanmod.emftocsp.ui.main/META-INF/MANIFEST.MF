@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: fr.inria.atlanmod.emftocsp.ui.main;singleton:=true
+Bundle-Version: 1.1.1.qualifier
+Bundle-Activator: fr.inria.atlanmod.emftocsp.ui.main.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.ui;bundle-version="3.6.0",
+ org.eclipse.core.runtime;bundle-version="3.6.0",
+ org.eclipse.uml2.uml.resources;bundle-version="3.0.0",
+ org.eclipse.ocl.ecore;bundle-version="3.0.0",
+ fr.inria.atlanmod.emftocsp;bundle-version="1.1.1",
+ fr.inria.atlanmod.emftocsp.eclipsecs;bundle-version="1.1.0",
+ fr.inria.atlanmod.emftocsp.emf;bundle-version="1.1.1",
+ fr.inria.atlanmod.emftocsp.emftoecl;bundle-version="1.1.1",
+ fr.inria.atlanmod.emftocsp.ui;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: %Bundle-Vendor
+Import-Package: com.parctechnologies.eclipse
+Export-Package: fr.inria.atlanmod.emftocsp.ui.main,
+ fr.inria.atlanmod.emftocsp.ui.main.commands,
+ fr.inria.atlanmod.emftocsp.ui.main.preferences
+

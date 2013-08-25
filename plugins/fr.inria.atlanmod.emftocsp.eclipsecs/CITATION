@@ -1,0 +1,17 @@
+To cite EMftoCSP in publications, please use:
+
+
+Carlos A. González, Fabian Büttner, Robert Clarisó and Jordi Cabot. EMFtoCSP: A tool for the lightweight verification of EMF models. FormSERA, 2012.
+
+
+A BibTeX entry for LaTeX users is
+
+
+@inproceedings{emftocsp
+  author = {Carlos A. Gonz\'alez and Fabian B{\"u}ttner and Robert Claris{\'o} and Jordi Cabot},
+  booktitle = {Formal Methods in Software Engineering: Rigorous and Agile Approaches (FormSERA)},
+  title = {EMFtoCSP: A tool for the lightweight verification of EMF models},  
+  year = {2012},
+  pages = {44-50},
+}
+

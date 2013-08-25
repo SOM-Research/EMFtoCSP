@@ -5,7 +5,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Parameter;
 
-import fr.inria.emftocsp.adapters.EParameterAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.EParameterAdapter;
 
 public class EParameterUMLAdapter extends EParameterAdapter<Parameter> {
 

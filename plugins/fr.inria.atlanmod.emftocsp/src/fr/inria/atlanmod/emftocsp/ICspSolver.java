@@ -23,9 +23,9 @@ public interface ICspSolver <ST> {
 
 public boolean solveCSP(File srcFile, List<File> libs) throws ProcessingException;  
 
-  public boolean solveCSP(File srcFile) throws ProcessingException;  
+public boolean solveCSP(File srcFile) throws ProcessingException;  
   
-  public Object getResult();
+public Object getResult();
 
 public ST getSolution();
 

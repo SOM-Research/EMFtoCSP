@@ -1,7 +1,8 @@
 package fr.inria.atlanmod.emftocsp.adapters.umlImpl;
 
 import java.util.List;
-import fr.inria.emftocsp.adapters.EResourceAdapter;
+
+import fr.inria.atlanmod.emftocsp.adapters.EResourceAdapter;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.emf.common.util.BasicEList;

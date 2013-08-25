@@ -1,6 +1,6 @@
 package fr.inria.atlanmod.emftocsp.adapters.umlImpl;
 
-import fr.inria.emftocsp.adapters.EAnnotationAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.EAnnotationAdapter;
 
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EAnnotation;

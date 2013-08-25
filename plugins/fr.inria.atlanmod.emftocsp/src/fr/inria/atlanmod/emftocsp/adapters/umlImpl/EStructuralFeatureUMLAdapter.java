@@ -12,7 +12,7 @@ import org.eclipse.uml2.uml.Classifier;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Property;
 
-import fr.inria.emftocsp.adapters.EStructuralFeatureAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.EStructuralFeatureAdapter;
 
 public class EStructuralFeatureUMLAdapter extends
 		EStructuralFeatureAdapter<Property> {

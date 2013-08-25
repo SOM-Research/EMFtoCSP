@@ -475,6 +475,7 @@ protected String genCardinalityInstantiationSection() {
 
   protected String genStringLabelingSection() {
 	    StringBuilder s = new StringBuilder();
+	    s.append("\t");
 		s.append("str_labeling.");
 	    return s.toString();    
 	  }

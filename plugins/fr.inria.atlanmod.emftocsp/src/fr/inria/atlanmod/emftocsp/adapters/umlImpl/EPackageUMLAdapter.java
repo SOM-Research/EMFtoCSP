@@ -14,7 +14,7 @@ import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.UMLPackage;
 
-import fr.inria.emftocsp.adapters.EPackageAdapter;
+import fr.inria.atlanmod.emftocsp.adapters.EPackageAdapter;
 
 public class EPackageUMLAdapter extends EPackageAdapter<Package> {
 

@@ -12,7 +12,8 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Class;
-import fr.inria.emftocsp.adapters.EReferenceAdapter;
+
+import fr.inria.atlanmod.emftocsp.adapters.EReferenceAdapter;
 
 
 public class EReferenceUMLAdapter extends EReferenceAdapter<Property> implements EStructuralFeature {
