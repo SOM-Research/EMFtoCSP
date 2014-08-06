@@ -20,4 +20,4 @@ plugins/fr.inria.atlanmod.emftocsp.ui/bin
 plugins/fr.inria.atlanmod.emftocsp.ui.main/.settings
 plugins/fr.inria.atlanmod.emftocsp.ui.main/bin
 
-wikiImages
+#wikiImages
