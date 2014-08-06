@@ -13,8 +13,6 @@ package fr.inria.atlanmod.emftocsp;
 import java.util.List;
 
 
-
-
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
@@ -50,6 +48,4 @@ public interface IModelReader<R, P, C, AS, AT, OP> {
 	public List<String> getAssociationNamesOfNonAbsClasses();
 
 	public R getResource();
-	
-
 }

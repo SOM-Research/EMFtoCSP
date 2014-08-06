@@ -25,5 +25,4 @@ public interface ILogger {
 	public void close();
 
 	public void close(String path);
-
 }

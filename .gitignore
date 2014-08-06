@@ -1,0 +1,23 @@
+#Files to be ignored from the EMFtoCSP plugins
+
+plugins/fr.inria.atlanmod.emftocsp/.settings
+plugins/fr.inria.atlanmod.emftocsp/bin
+
+plugins/fr.inria.atlanmod.emftocsp.eclipsecs/.settings
+plugins/fr.inria.atlanmod.emftocsp.eclipsecs/bin
+
+plugins/fr.inria.atlanmod.emftocsp.eclipsecs.libs/.settings
+
+plugins/fr.inria.atlanmod.emftocsp.emf/.settings
+plugins/fr.inria.atlanmod.emftocsp.emf/bin
+
+plugins/fr.inria.atlanmod.emftocsp.emftoecl/.settings
+plugins/fr.inria.atlanmod.emftocsp.emftoecl/bin
+
+plugins/fr.inria.atlanmod.emftocsp.ui/.settings
+plugins/fr.inria.atlanmod.emftocsp.ui/bin
+
+plugins/fr.inria.atlanmod.emftocsp.ui.main/.settings
+plugins/fr.inria.atlanmod.emftocsp.ui.main/bin
+
+wikiImages

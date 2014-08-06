@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013 INRIA Rennes Bretagne-Atlantique.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     INRIA Rennes Bretagne-Atlantique - initial API and implementation
+ *******************************************************************************/
 package fr.inria.atlanmod.emftocsp.adapters;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,16 +26,20 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 
+/**
+ * @author <a href="mailto:amine.benelallam@inria.fr">Amine Benelallam</a>
+ *
+ */
 public abstract class EAnnotationAdapter<A> implements EAnnotation {
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((origEAnnotation == null) ? 0 : origEAnnotation.hashCode());
+		result = prime * result	+ ((origEAnnotation == null) ? 0 : origEAnnotation.hashCode());
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -45,9 +59,10 @@ public abstract class EAnnotationAdapter<A> implements EAnnotation {
 
 	protected A origEAnnotation;
 	
-	public EAnnotationAdapter(A newEAnnotation){
+	public EAnnotationAdapter(A newEAnnotation) {
 		origEAnnotation = newEAnnotation;
 	}
+	
 	@Override
 	public EList<EAnnotation> getEAnnotations() {
 		throw new UnsupportedOperationException();
@@ -116,7 +131,6 @@ public abstract class EAnnotationAdapter<A> implements EAnnotation {
 	@Override
 	public void eSet(EStructuralFeature feature, Object newValue) {
 		throw new UnsupportedOperationException();
-
 	}
 
 	@Override
@@ -127,12 +141,10 @@ public abstract class EAnnotationAdapter<A> implements EAnnotation {
 	@Override
 	public void eUnset(EStructuralFeature feature) {
 		throw new UnsupportedOperationException();
-
 	}
 
 	@Override
-	public Object eInvoke(EOperation operation, EList<?> arguments)
-			throws InvocationTargetException {
+	public Object eInvoke(EOperation operation, EList<?> arguments)	throws InvocationTargetException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -149,13 +161,11 @@ public abstract class EAnnotationAdapter<A> implements EAnnotation {
 	@Override
 	public void eSetDeliver(boolean deliver) {
 		throw new UnsupportedOperationException();
-
 	}
 
 	@Override
 	public void eNotify(Notification notification) {
 		throw new UnsupportedOperationException();
-
 	}
 
 	@Override
@@ -186,5 +196,4 @@ public abstract class EAnnotationAdapter<A> implements EAnnotation {
 	public EList<EObject> getReferences() {
 		throw new UnsupportedOperationException();
 	}
-
 }

@@ -17,6 +17,5 @@ package fr.inria.atlanmod.emftocsp;
  */
 public interface IModelToCspSolverFactory<R,ST> {
 
-	IModelToCspSolver<R, ST> getModelToCspSolver();
-	
+	IModelToCspSolver<R, ST> getModelToCspSolver();	
 }

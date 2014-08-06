@@ -18,17 +18,12 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.emf.ecore.EClass;
-
-import fr.inria.atlanmod.emftocsp.modelbuilder.Point;
 
 
 /**
  * @author <a href="mailto:carlos.gonzalez@inria.fr">Carlos A. González</a>
  *
  */
-
-
 public interface IModelToCspSolver<R,ST> {
 
 	public void setModel(R modelResource);
@@ -83,15 +78,7 @@ public interface IModelToCspSolver<R,ST> {
 
 	void setBuilder(IModelBuilder<R, ?, ?, ?, ?, ?, ST> builder);
 
-//	public List<Point> getConcernedAttributes();
-//
-//	public Map<EClass, Point> getInvolvedClasses();
-
 	void setConstraintsDocument(URI fileURI) throws CoreException;
 
 	public void setConstraintsDocumentToNull();
-
-
-	
-
 }

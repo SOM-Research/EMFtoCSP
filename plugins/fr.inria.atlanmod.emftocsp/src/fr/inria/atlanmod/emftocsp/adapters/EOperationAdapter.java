@@ -1,5 +1,15 @@
 package fr.inria.atlanmod.emftocsp.adapters;
 
+/*******************************************************************************
+ * Copyright (c) 2013 INRIA Rennes Bretagne-Atlantique.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     INRIA Rennes Bretagne-Atlantique - initial API and implementation
+ *******************************************************************************/
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -20,6 +30,10 @@ import org.eclipse.emf.ecore.resource.Resource;
 
 import fr.inria.atlanmod.emftocsp.adapters.umlImpl.EClassUMLAdapter;
 
+/**
+ * @author <a href="mailto:amine.benelallam@inria.fr">Amine Benelallam</a>
+ *
+ */
 public abstract class EOperationAdapter<O> implements EOperation {
 
 	@Override
