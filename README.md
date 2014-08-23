@@ -10,7 +10,7 @@ If you want to find out more about EMFtoCSP, you can read our paper [EMFtoCSP: A
 Authors
 =======
 
-EMFToCSP has been developed by [AtlanMod](http://www.emn.fr/z-info/atlanmod/index.php/Main_Page AtlanMod), an [INRIA](http://www.inria.fr/) research team. The tool is an evolution of the previous tool [UMLtoCSP](http://gres.uoc.edu/UMLtoCSP/) developed at the Open University of Catalonia.  
+EMFToCSP is the result of a collaboration between [AtlanMod](http://www.emn.fr/z-info/atlanmod/index.php/Main_Page AtlanMod), an [INRIA](http://www.inria.fr/) research team, and the [GRES] (http://gres.uoc.edu/) research group from the [Open University of Catalonia](http://www.uoc.edu/) .  
 
 Installation and Usage
 ======================
