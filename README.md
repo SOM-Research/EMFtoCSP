@@ -10,7 +10,7 @@ If you want to find out more about EMFtoCSP, you can read our paper [EMFtoCSP: A
 Authors
 =======
 
-EMFToCSP is the result of a collaboration between [AtlanMod](http://www.emn.fr/z-info/atlanmod/index.php/Main_Page AtlanMod), an [INRIA](http://www.inria.fr/) research team, and the [GRES] (http://gres.uoc.edu/) research group from the [Open University of Catalonia](http://www.uoc.edu/) .  
+EMFToCSP is the result of a collaboration between [AtlanMod](http://www.emn.fr/z-info/atlanmod/index.php/Main_Page), an [INRIA](http://www.inria.fr/) research team, and the [GRES] (http://gres.uoc.edu/) research group from the [Open University of Catalonia](http://www.uoc.edu/) .  
 
 Installation and Usage
 ======================
