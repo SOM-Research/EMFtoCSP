@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="ER">
+  <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+    <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+  </eAnnotations>
+  <eClassifiers xsi:type="ecore:EClass" name="Schema">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="ERN RN EN"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="ERN" value="entities->forAll(e : Entity | relships->forAll(r : Relship | e.name &lt;> r.name))"/>
+      <details key="RN" value="relships->forAll(r1 : Relship, r2 : Relship | r1.name = r2.name implies r1 = r2)"/>
+      <details key="EN" value="entities->forAll(e1 : Entity, e2 : Entity | e1.name = e2.name implies e1 = e2)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entities" ordered="false"
+        lowerBound="1" upperBound="-1" eType="#//Entity" containment="true" eOpposite="#//Entity/schema"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relships" ordered="false"
+        upperBound="-1" eType="#//Relship" containment="true" eOpposite="#//Relship/schema"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Entity">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="EAN KEY"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="EAN" value="attrs->forAll(a1 : Attribute, a2 : Attribute | a1.name = a2.name implies a1 = a2)"/>
+      <details key="KEY" value="attrs->exists(a : Attribute | a.isKey = true)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="schema" ordered="false"
+        lowerBound="1" eType="#//Schema" eOpposite="#//Schema/entities"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ends" ordered="false" upperBound="-1"
+        eType="#//RelshipEnd" eOpposite="#//RelshipEnd/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="attrs" ordered="false"
+        lowerBound="1" upperBound="-1" eType="#//Attribute" containment="true" eOpposite="#//Attribute/entity"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Relship">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="REN"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="REN" value="ends->forAll(e1 : RelshipEnd, e2 : RelshipEnd | e1.name = e2.name implies e1 = e2)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="schema" ordered="false"
+        lowerBound="1" eType="#//Schema" eOpposite="#//Schema/relships"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ends" ordered="false" lowerBound="2"
+        upperBound="-1" eType="#//RelshipEnd" containment="true" eOpposite="#//RelshipEnd/relship"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RelshipEnd">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" ordered="false" lowerBound="1"
+        eType="#//Entity" eOpposite="#//Entity/ends"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relship" ordered="false"
+        lowerBound="1" eType="#//Relship" eOpposite="#//Relship/ends"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Attribute">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isKey" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entity" ordered="false"
+        lowerBound="1" eType="#//Entity" eOpposite="#//Entity/attrs"/>
+  </eClassifiers>
+</ecore:EPackage>

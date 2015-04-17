@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="eShop" nsURI="http://www.example.com/" nsPrefix="eShop">
+  <eClassifiers xsi:type="ecore:EClass" name="Customer">
+    <eOperations name="newCustomer" eType="#//Customer">
+      <eParameters name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eParameters name="p" lowerBound="1" eType="#//Portal"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="portal" lowerBound="1"
+        eType="#//Portal" eOpposite="#//Portal/customers"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sale" upperBound="-1" eType="#//Sale"
+        eOpposite="#//Sale/purchaser"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="GoldCustomer" eSuperTypes="#//Customer"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Portal">
+    <eOperations name="removeGoldCategory">
+      <eParameters name="c" lowerBound="1" eType="#//Customer"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="url" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="customers" upperBound="-1"
+        eType="#//Customer" eOpposite="#//Customer/portal"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sale">
+    <eOperations name="addSaleLine" eType="#//SaleLine">
+      <eParameters name="p" lowerBound="1" eType="#//Product"/>
+      <eParameters name="quantity" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="paid" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="amount" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="purchaser" lowerBound="1"
+        eType="#//Customer" eOpposite="#//Customer/sale"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lines" upperBound="-1"
+        eType="#//SaleLine" eOpposite="#//SaleLine/sale"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SaleLine">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="quantity" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sale" eType="#//Sale" eOpposite="#//Sale/lines"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="product" lowerBound="1"
+        eType="#//Product" eOpposite="#//Product/salesLines"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Product">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="price" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="stock" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="salesLines" upperBound="-1"
+        eType="#//SaleLine" eOpposite="#//SaleLine/product"/>
+  </eClassifiers>
+</ecore:EPackage>
