@@ -11,10 +11,17 @@
 package fr.inria.atlanmod.emftocsp.ui.wizards.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -25,8 +32,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.osgi.framework.FrameworkUtil;
 
+import fr.inria.atlanmod.emftocsp.IModelProperty;
 import fr.inria.atlanmod.emftocsp.IModelToCspSolver;
 import fr.inria.atlanmod.emftocsp.ProcessingException;
+import fr.inria.atlanmod.emftocsp.impl.LackOfConstraintsRedundanciesModelProperty;
+import fr.inria.atlanmod.emftocsp.impl.LackOfConstraintsSubsumptionsModelProperty;
+import fr.inria.atlanmod.emftocsp.impl.LivelinessModelProperty;
+import fr.inria.atlanmod.emftocsp.impl.StrongSatisfiabilityModelProperty;
+import fr.inria.atlanmod.emftocsp.impl.WeakSatisfiabilityModelProperty;
 import fr.inria.atlanmod.emftocsp.ui.messages.Messages;
 import fr.inria.atlanmod.emftocsp.ui.wizards.IWizardNavigation;
 
@@ -76,6 +89,7 @@ public abstract class ValidationWizard extends Wizard  {
 		try {
 			logFileName = modelSolver.getResultLocation().getRawLocation().append(modelSolver.getModelFileName() + ".log").toOSString();
 			File importsFolder;
+			generatePropertiesFile(modelSolver);
 			try {
 				importsFolder = new File(FileLocator.toFileURL(FrameworkUtil.getBundle(fr.inria.atlanmod.emftocsp.eclipsecs.EclipseSolver.class).getEntry("/libs")).toURI());
 			} catch (URISyntaxException e) {
@@ -158,5 +172,43 @@ public abstract class ValidationWizard extends Wizard  {
 	
 	public final IWizardNavigation GetWizardNavigation() {
       return wizardNavigation;
+	}
+	private void generatePropertiesFile(IModelToCspSolver<?,?> modelSolver) throws FileNotFoundException{
+		File propertiesFile = new File(modelSolver.getResultLocation().getRawLocation().append(modelSolver.getModelFileName()+".properties").toOSString());
+		PrintWriter printWriter = new PrintWriter(propertiesFile);
+		printWriter.println("### OCL file seleciton");
+		printWriter.println("oclFile = "+ (modelSolver.getConstraintsDocument()!= null?modelSolver.getConstraintsDocument().getName():""));
+		printWriter.println();
+		printWriter.println("##### Properties selection\n### Model properties");
+		List<IModelProperty> modelProperties = modelSolver.getModelProperties();
+		for(IModelProperty modelProperty : modelProperties){
+			if(modelProperty instanceof StrongSatisfiabilityModelProperty)
+				printWriter.println("strongSatisfiability = true");
+			if(modelProperty instanceof WeakSatisfiabilityModelProperty)
+				printWriter.println("weakSatisfiability = true");
+			if(modelProperty instanceof LivelinessModelProperty){
+				printWriter.println("liveliness = true");
+				printWriter.println("livelinessClass = "+modelProperty.getTargetModelElementsNames().get(0));
+			}
+			if(modelProperty instanceof LackOfConstraintsSubsumptionsModelProperty){
+				printWriter.println("lackOfConstraintsSubsumptions = true");
+				String[] assos= modelProperty.getTargetModelElementsNames().get(0).split(",");
+				printWriter.println("lackOfConstraintsSubsumptions1 = "+assos[0]);
+				printWriter.println("lackOfConstraintsSubsumptions2 = "+assos[1]);
+			}
+			if(modelProperty instanceof LackOfConstraintsRedundanciesModelProperty){
+				printWriter.println("lackOfConstraintsRedundanciess = true");
+				String[] assos= modelProperty.getTargetModelElementsNames().get(0).split(",");
+				printWriter.println("lackOfConstraintsRedundancies1 = "+assos[0]);
+				printWriter.println("lackOfConstraintsRedundancies2 = "+assos[1]);
+			}
+		}
+		printWriter.println("\n## Domains and cardinalities");
+		Set<Map.Entry<String, String>> entrySet = modelSolver.getModelElementsDomain().entrySet();
+		for(Map.Entry<String, String> entry : entrySet){
+			printWriter.println(entry.getKey() +" = "+entry.getValue());
+		}
+		printWriter.close();
+		
 	}
 }
