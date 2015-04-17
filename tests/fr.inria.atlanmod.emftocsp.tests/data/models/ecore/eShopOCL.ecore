@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="eShop" nsURI="http://www.example.com/" nsPrefix="eShop">
+  <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+    <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL"/>
+    <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL"/>
+    <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL"/>
+  </eAnnotations>
+  <eClassifiers xsi:type="ecore:EClass" name="Customer">
+    <eOperations name="newCustomer" eType="#//Customer">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+        <details key="precondition" value="true"/>
+        <details key="postcondition" value="result.oclIsNew() and result.name=name and result.portal=p"/>
+      </eAnnotations>
+      <eParameters name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eParameters name="p" lowerBound="1" eType="#//Portal"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="portal" lowerBound="1"
+        eType="#//Portal" eOpposite="#//Portal/customers"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sale" upperBound="-1" eType="#//Sale"
+        eOpposite="#//Sale/purchaser"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="GoldCustomer" eSuperTypes="#//Customer">
+    <eAnnotations source="&quot;http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="salesAmount"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="salesAmount" value="Product::allInstances()->collect(s|s.price)->sum()>10&#xD;&#xA;"/>
+    </eAnnotations>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Portal">
+    <eOperations name="removeGoldCategory">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+        <details key="precondition" value="c.oclIsTypeOf(GoldCustomer) and c.sale->isEmpty()"/>
+        <details key="postcondition" value="not c.oclIsTypeOf(GoldCustomer)"/>
+      </eAnnotations>
+      <eParameters name="c" lowerBound="1" eType="#//Customer"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="url" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="customers" upperBound="-1"
+        eType="#//Customer" eOpposite="#//Customer/portal"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sale">
+    <eOperations name="addSaleLine" eType="#//SaleLine">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+        <details key="precondition" value="p.stock > 0"/>
+        <details key="postcondition" value="result.oclIsNew() and result.sale=self and result.product=p and result.quantity=quantity and&#xD;&#xA;&#x9;p.stock=p.stock@pre-quantity and self.amount=self.amount@pre + quantity*p.price"/>
+      </eAnnotations>
+      <eParameters name="p" lowerBound="1" eType="#//Product"/>
+      <eParameters name="quantity" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="paid" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="amount" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="purchaser" lowerBound="1"
+        eType="#//Customer" eOpposite="#//Customer/sale"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SaleLine">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="quantity" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sale" eType="#//Sale" eOpposite="#//SaleLine/lines"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="product" lowerBound="1"
+        eType="#//Product" eOpposite="#//Product/salesLines"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lines" lowerBound="1" upperBound="-1"
+        eType="#//SaleLine" eOpposite="#//SaleLine/sale"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Product">
+    <eAnnotations source="&quot;http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="minStock"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="minStock" value="Product::allInstances()->forAll(p|p.stock>=5)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="price" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="stock" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="salesLines" upperBound="-1"
+        eType="#//SaleLine" eOpposite="#//SaleLine/product"/>
+  </eClassifiers>
+</ecore:EPackage>

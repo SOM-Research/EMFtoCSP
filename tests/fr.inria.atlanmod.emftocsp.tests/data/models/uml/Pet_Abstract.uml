@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20110701" xmlns:xmi="http://www.omg.org/spec/XMI/20110701" xmlns:uml="http://www.eclipse.org/uml2/4.0.0/UML" xmi:id="_D1tUcAs2EeO-s8lzTcTKGg" name="pet" URI="http://Pet.com">
+  <packagedElement xmi:type="uml:Class" xmi:id="_FiUAMAs2EeO-s8lzTcTKGg" name="Person">
+    <eAnnotations xmi:id="_P3OMQAs7EeOsr5hf6E0HzQ" source="http://www.eclipse.org/emf/2002/Ecore">
+      <details xmi:id="_Uda7UAs7EeOsr5hf6E0HzQ" key="constraints" value="animalAt"/>
+    </eAnnotations>
+    <eAnnotations xmi:id="_cJWsQAs7EeOsr5hf6E0HzQ" source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details xmi:id="_ibmtcAs7EeOsr5hf6E0HzQ" key="animalAt" value="self.pets->at(1) &lt;> null&#xD;&#xA;"/>
+    </eAnnotations>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_GSW9EAs2EeO-s8lzTcTKGg" name="Pet" isAbstract="true">
+    <ownedAttribute xmi:id="_NOsdEAs2EeO-s8lzTcTKGg" name="id">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_HhoMkAs2EeO-s8lzTcTKGg" name="Cat">
+    <generalization xmi:id="_jNdacAs2EeO-s8lzTcTKGg" general="_GSW9EAs2EeO-s8lzTcTKGg"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_IYyeEAs2EeO-s8lzTcTKGg" name="Dog">
+    <generalization xmi:id="_oolmYAs2EeO-s8lzTcTKGg" general="_HhoMkAs2EeO-s8lzTcTKGg"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_r4UcUAs3EeOsr5hf6E0HzQ" name="animals" memberEnd="__kazgAs3EeOsr5hf6E0HzQ _IKU5YAs4EeOsr5hf6E0HzQ">
+    <ownedEnd xmi:id="__kazgAs3EeOsr5hf6E0HzQ" name="pets" type="_GSW9EAs2EeO-s8lzTcTKGg" isOrdered="true" aggregation="composite" association="_r4UcUAs3EeOsr5hf6E0HzQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_bI-7wAs4EeOsr5hf6E0HzQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_aMBkQAs4EeOsr5hf6E0HzQ" value="*"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_IKU5YAs4EeOsr5hf6E0HzQ" name="owner" type="_FiUAMAs2EeO-s8lzTcTKGg" association="_r4UcUAs3EeOsr5hf6E0HzQ"/>
+  </packagedElement>
+</uml:Model>

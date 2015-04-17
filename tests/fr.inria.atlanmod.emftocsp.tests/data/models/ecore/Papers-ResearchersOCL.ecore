@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="MyPackage"
+    nsURI="http://www.example.com/" nsPrefix="MyPackage">
+  <eClassifiers xsi:type="ecore:EClass" name="Paper">
+    <eAnnotations source="&quot;http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="AuthorsOfStudentPaper LimitsOnStudentPapers PaperLength NoStudentReviewers"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="PaperLength" value="Paper::allInstances()->forAll(p|p.wordCount &lt; 10000)"/>
+      <details key="NoStudentReviewers" value="Paper::allInstances()->forAll(p| p.referee->forAll(r| not r.isStudent))"/>
+      <details key="LimitsOnStudentPapers" value="Paper::allInstances()->exists(p|p.studentPaper) and Paper::allInstances()->select(p|p.studentPaper)->size() &lt; 5"/>
+      <details key="AuthorsOfStudentPaper" value="Paper::allInstances()->forAll(p|p.studentPaper = p.author->exists(x|x.isStudent))"/>
+    </eAnnotations>
+    <eOperations name="getAuthors" upperBound="-1" eType="#//Researcher"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="wordCount" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="studentPaper" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="referee" lowerBound="3"
+        upperBound="3" eType="#//Researcher" eOpposite="#//Researcher/submission"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="author" lowerBound="1"
+        upperBound="2" eType="#//Researcher" eOpposite="#//Researcher/manuscript"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Researcher">
+    <eAnnotations source="&quot;http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="NoSelfReviews"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="NoSelfReviews" value="Researcher::allInstances()->forAll(r|r.submission->excludes(r.manuscript))"/>
+    </eAnnotations>
+    <eOperations name="getPapers" upperBound="-1" eType="#//Paper">
+      <eParameters name="authorName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isStudent" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="submission" lowerBound="1"
+        eType="#//Paper" eOpposite="#//Paper/referee"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manuscript" lowerBound="1"
+        eType="#//Paper" eOpposite="#//Paper/author"/>
+  </eClassifiers>
+</ecore:EPackage>
