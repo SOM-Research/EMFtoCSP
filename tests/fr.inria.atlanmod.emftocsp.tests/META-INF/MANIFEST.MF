@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Test
 Bundle-SymbolicName: fr.inria.atlanmod.emftocsp.tests
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: fr.inria.atlanmod.emftocsp.benchmarks.EMFtoCSPBenchmarksPlugin
+Bundle-Activator: fr.inria.atlanmod.emftocsp.tests.EMFtoCSPTestsPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
